@@ -6,21 +6,32 @@ import Link from "next/link"
 import { Play, Heart, Plus, MoreHorizontal, Shuffle, SkipBack, SkipForward, Repeat, Volume2, Upload, Library } from "lucide-react"
 import { UploadSong } from "@/components/media/upload-song"
 import { RecentlyUploaded } from "@/components/media/recently-uploaded"
-import { useState } from "react"
+import { useState, useEffect } from 'react'
+import { randomSeedService } from '@/services/randomSeedService'
 
 export default function Home() {
   const [showUpload, setShowUpload] = useState(false)
   const [refreshSongs, setRefreshSongs] = useState(0)
+  const [playlists, setPlaylists] = useState<any[]>([])
+  const [isLoadingPlaylists, setIsLoadingPlaylists] = useState(true)
 
-  // Mock data for demonstration
-  const playlists = [
-    { id: 1, name: "Liked Songs", description: "127 songs", color: "bg-gradient-to-br from-purple-900 to-blue-500" },
-    { id: 2, name: "Daily Mix 1", description: "Made for you", color: "bg-gradient-to-br from-green-900 to-emerald-500" },
-    { id: 3, name: "Chill Vibes", description: "Your calm space", color: "bg-gradient-to-br from-orange-900 to-red-500" },
-    { id: 4, name: "Workout Energy", description: "Power through your workout", color: "bg-gradient-to-br from-blue-900 to-cyan-500" },
-    { id: 5, name: "Focus Flow", description: "Concentrate and flow", color: "bg-gradient-to-br from-pink-900 to-rose-500" },
-    { id: 6, name: "Community Uploads", description: "Songs from our users", color: "bg-gradient-to-br from-yellow-900 to-amber-500" },
-  ]
+    useEffect(() => {
+    loadTodaysPlaylists()
+    }, [])
+  
+   const loadTodaysPlaylists = async () => {
+    try {
+      setIsLoadingPlaylists(true)
+      const todaysPlaylists = await randomSeedService.getTodaysPlaylists()
+      setPlaylists(todaysPlaylists)
+    } catch (error) {
+      console.error('Error loading playlists:', error)
+      setPlaylists(randomSeedService.getFallbackPlaylists())
+    } finally {
+      setIsLoadingPlaylists(false)
+    }
+  }
+  
 
   const handleUploadSuccess = () => {
     setRefreshSongs(prev => prev + 1)
@@ -128,19 +139,36 @@ export default function Home() {
                 {/* Regular Home Content */}
                 <section className="mb-8">
                   <h1 className="text-3xl font-bold mb-6">Good afternoon</h1>
-                  <div className="grid grid-cols-3 gap-4">
-                    {playlists.slice(0, 6).map((playlist) => (
-                      <div key={playlist.id} className="bg-gray-800 bg-opacity-60 rounded-md flex items-center overflow-hidden hover:bg-gray-700 transition-all cursor-pointer group">
-                        <div className={`w-16 h-16 ${playlist.color} flex-shrink-0`}></div>
-                        <div className="p-4 flex-1">
-                          <h3 className="font-semibold">{playlist.name}</h3>
-                        </div>
-                        <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105">
-                          <Play className="w-5 h-5 text-black" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  {isLoadingPlaylists ? (
+            <div className="grid grid-cols-2 gap-4">
+              {[1,2,3,4,5,6,7,8,9,10].map(i => (
+                <div key={i} className="bg-gray-800 rounded-md animate-pulse h-20"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+  {playlists.map((playlist) => (
+    <Link 
+      key={playlist.id} 
+      href={`/playlist/${playlist.id}`}
+      className="block"
+    >
+      <div className="bg-gray-800 bg-opacity-60 rounded-md flex items-center overflow-hidden hover:bg-gray-700 transition-all cursor-pointer group">
+        <div className={`w-16 h-16 ${playlist.color} flex-shrink-0`}></div>
+        <div className="p-4 flex-1">
+          <h3 className="font-semibold">{playlist.name}</h3>
+          <p className="text-gray-400 text-sm">
+            {playlist.songCount > 0 ? `${playlist.songCount} songs` : playlist.description}
+          </p>
+        </div>
+        <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105">
+          <Play className="w-5 h-5 text-black" />
+        </button>
+      </div>
+    </Link>
+  ))}
+</div>
+          )}
                 </section>
 
                 <section className="mb-8">

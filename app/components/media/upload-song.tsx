@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Upload, X } from 'lucide-react'
 import { songService } from '@/services/songService'
+import { randomSeedService } from '@/services/randomSeedService'
 
 interface UploadSongProps {
   onUploadSuccess?: () => void
@@ -78,6 +79,48 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
       setIsUploading(false)
     }
   }
+
+ const handleUploadSuccess = async () => {
+  try {
+    // Check if we have playlists for today
+    const hasPlaylists = await randomSeedService.hasPlaylistsForToday()
+    
+    if (!hasPlaylists) {
+      console.log('First upload today - generating playlists...')
+      
+      // Step 1: Generate seed (if needed)
+      const seedResult = await fetch('/api/generate-daily-seed')
+      const seedData = await seedResult.json()
+      
+      if (seedData.success) {
+        console.log('Seed generated, now generating playlists...')
+        
+        // Step 2: Generate playlists with the seed
+        const playlistsResult = await fetch('/api/generate-playlists')
+        const playlistsData = await playlistsResult.json()
+        
+        if (playlistsData.success) {
+          console.log('🎵 Daily playlists generated successfully!')
+        } else {
+          console.error('Failed to generate playlists:', playlistsData.error)
+        }
+      } else {
+        console.error('Failed to generate seed:', seedData.error)
+      }
+    }
+    
+    // Refresh the UI
+    onUploadSuccess?.()
+    
+  } catch (error) {
+    console.error('Error in upload success handler:', error)
+  } finally {
+    // Reset form
+    setFormData({ title: '', artist: '', album: '' })
+    setSelectedFile(null)
+    setShowForm(false)
+  }
+}
 
   if (!showForm) {
     return (
