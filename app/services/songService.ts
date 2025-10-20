@@ -1,9 +1,10 @@
 import { supabase } from '@/lib/supabase'
 import { Song, UploadSongData } from '@/types/song'
+import { useUser } from '@/contexts/UserContext'
 
 export const songService = {
   // Upload song file to storage and create record
-  async uploadSong(songData: UploadSongData) {
+   async uploadSong(songData: UploadSongData, userId?: string) {
     try {
       const { title, artist, album, file } = songData
       
@@ -12,8 +13,9 @@ export const songService = {
       const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`
       const filePath = `songs/${fileName}`
 
+
       // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('songs')
         .upload(filePath, file)
 
@@ -22,22 +24,29 @@ export const songService = {
       }
 
       // Get public URL for the uploaded file
-      const { data: { publicUrl } } = supabase.storage
+       const { data: { publicUrl } } = supabase.storage
         .from('songs')
         .getPublicUrl(filePath)
 
-      // Create song record in database
+            // Create song record in database with user association
+      const songDataToInsert: any = {
+        title,
+        artist,
+        album,
+        file_path: filePath,
+        file_size: file.size,
+        mime_type: file.type,
+        duration: 0,
+      }
+
+      // Add user_id if available
+      if (userId) {
+        songDataToInsert.user_id = userId
+      }
+
       const { data: song, error: dbError } = await supabase
         .from('songs')
-        .insert({
-          title,
-          artist,
-          album,
-          file_path: filePath,
-          file_size: file.size,
-          mime_type: file.type,
-          duration: 0, // We'll need to calculate this client-side or server-side
-        })
+        .insert(songDataToInsert)
         .select()
         .single()
 

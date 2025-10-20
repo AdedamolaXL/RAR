@@ -20,11 +20,7 @@ const config = {
     currency: "USD",
   },
   networks: {
-    "blast-sepolia": {
-      url: "https://sepolia.blast.io",
-      accounts: process.env.WALLET_KEY ? [process.env.WALLET_KEY] : [],
-      gasPrice: 20000000,
-    },
+
     "arbitrum-sepolia": {
       url: "https://sepolia-rollup.arbitrum.io/rpc", // Fixed RPC URL
       accounts: process.env.WALLET_KEY ? [process.env.WALLET_KEY] : [],
@@ -32,18 +28,9 @@ const config = {
   },
   etherscan: {
     apiKey: {
-      "blast-sepolia": process.env.BLAST_SCAN_API_KEY || "",
       "arbitrum-sepolia": process.env.ARBISCAN_API_KEY || "",
     },
     customChains: [
-      {
-        network: "blast-sepolia",
-        chainId: 168587773,
-        urls: {
-          apiURL: "https://api-sepolia.blastscan.io/api",
-          browserURL: "https://sepolia.blastscan.io",
-        },
-      },
       {
         network: "arbitrum-sepolia", 
         chainId: 421614,

@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Upload, X } from 'lucide-react'
 import { songService } from '@/services/songService'
 import { randomSeedService } from '@/services/randomSeedService'
+import { useUser } from '@/contexts/UserContext'
 
 interface UploadSongProps {
   onUploadSuccess?: () => void
@@ -20,6 +21,8 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
     album: '',
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  const { user } = useUser()
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -51,19 +54,19 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
+  event.preventDefault()
+  
+  if (!selectedFile || !formData.title || !formData.artist) {
+    alert('Please fill in all required fields and select a file')
+    return
+  }
     
-    if (!selectedFile || !formData.title || !formData.artist) {
-      alert('Please fill in all required fields and select a file')
-      return
-    }
-
-    setIsUploading(true)
-    try {
-      await songService.uploadSong({
-        ...formData,
-        file: selectedFile
-      })
+      setIsUploading(true)
+  try {
+    await songService.uploadSong({
+      ...formData,
+      file: selectedFile
+    }, user?.id)
 
       // Reset form
       setFormData({ title: '', artist: '', album: '' })
@@ -72,14 +75,13 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
       
       alert('Song uploaded successfully!')
       onUploadSuccess?.()
-    } catch (error) {
-      console.error('Upload failed:', error)
-      alert('Upload failed. Please try again.')
-    } finally {
-      setIsUploading(false)
-    }
+      } catch (error) {
+    console.error('Upload failed:', error)
+    alert('Upload failed. Please try again.')
+  } finally {
+    setIsUploading(false)
   }
-
+}
  const handleUploadSuccess = async () => {
   try {
     // Check if we have playlists for today
