@@ -6,9 +6,11 @@ const AppModule = buildModule("AppModule", (m) => {
 
   // const nftGrowth = m.contract("NFTGrowth", [EntropyAddress, ProviderAddress]);
   const randomSeed = m.contract("RandomSeed", [EntropyAddress]);
+  const coinFlip = m.contract("CoinFlip", [EntropyAddress, ProviderAddress]);
 
   return {
-    randomSeed
+    randomSeed,
+    coinFlip
   };
 });
 

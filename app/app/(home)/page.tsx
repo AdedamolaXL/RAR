@@ -138,38 +138,80 @@ export default function Home() {
               <>
                 {/* Regular Home Content */}
                 <section className="mb-8">
-                  <h1 className="text-3xl font-bold mb-6">Good afternoon</h1>
-                  {isLoadingPlaylists ? (
-            <div className="grid grid-cols-2 gap-4">
-              {[1,2,3,4,5,6,7,8,9,10].map(i => (
-                <div key={i} className="bg-gray-800 rounded-md animate-pulse h-20"></div>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-  {playlists.map((playlist) => (
-    <Link 
-      key={playlist.id} 
-      href={`/playlist/${playlist.id}`}
-      className="block"
-    >
-      <div className="bg-gray-800 bg-opacity-60 rounded-md flex items-center overflow-hidden hover:bg-gray-700 transition-all cursor-pointer group">
-        <div className={`w-16 h-16 ${playlist.color} flex-shrink-0`}></div>
-        <div className="p-4 flex-1">
-          <h3 className="font-semibold">{playlist.name}</h3>
-          <p className="text-gray-400 text-sm">
-            {playlist.songCount > 0 ? `${playlist.songCount} songs` : playlist.description}
-          </p>
+  <h1 className="text-3xl font-bold mb-2">Create Your Ultimate Playlist Battle</h1>
+  <p className="text-gray-400 mb-6">Go head-to-head in a fastest finger playlist showdown</p>
+  
+  {isLoadingPlaylists ? (
+    <div className="grid grid-cols-2 gap-4">
+      {[1,2,3,4].map(i => (
+        <div key={i} className="bg-gray-800 rounded-md animate-pulse h-20"></div>
+      ))}
+    </div>
+  ) : (
+    <div className="grid grid-cols-2 gap-4">
+      {/* Four playlist prompts */}
+      <Link href="/playlist/create" className="block">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-md flex items-center overflow-hidden hover:scale-105 transition-all cursor-pointer group">
+          <div className="w-16 h-16 bg-black bg-opacity-20 flex items-center justify-center flex-shrink-0">
+            <Play className="w-6 h-6 text-white" />
+          </div>
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold">Workout Energy Mix</h3>
+            <p className="text-gray-200 text-sm">High-energy tracks to fuel your session</p>
+          </div>
+          <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-2 hover:scale-105">
+            <Play className="w-4 h-4 text-black" />
+          </button>
         </div>
-        <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105">
-          <Play className="w-5 h-5 text-black" />
-        </button>
-      </div>
-    </Link>
-  ))}
-</div>
-          )}
-                </section>
+      </Link>
+
+      <Link href="/playlist/create" className="block">
+        <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-md flex items-center overflow-hidden hover:scale-105 transition-all cursor-pointer group">
+          <div className="w-16 h-16 bg-black bg-opacity-20 flex items-center justify-center flex-shrink-0">
+            <Play className="w-6 h-6 text-white" />
+          </div>
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold">Chill Vibes Only</h3>
+            <p className="text-gray-200 text-sm">Relaxing beats for your downtime</p>
+          </div>
+          <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-2 hover:scale-105">
+            <Play className="w-4 h-4 text-black" />
+          </button>
+        </div>
+      </Link>
+
+      <Link href="/playlist/create" className="block">
+        <div className="bg-gradient-to-r from-orange-600 to-red-600 rounded-md flex items-center overflow-hidden hover:scale-105 transition-all cursor-pointer group">
+          <div className="w-16 h-16 bg-black bg-opacity-20 flex items-center justify-center flex-shrink-0">
+            <Play className="w-6 h-6 text-white" />
+          </div>
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold">Party Starters</h3>
+            <p className="text-gray-200 text-sm">Get the celebration going</p>
+          </div>
+          <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-2 hover:scale-105">
+            <Play className="w-4 h-4 text-black" />
+          </button>
+        </div>
+      </Link>
+
+      <Link href="/playlist/create" className="block">
+        <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-md flex items-center overflow-hidden hover:scale-105 transition-all cursor-pointer group">
+          <div className="w-16 h-16 bg-black bg-opacity-20 flex items-center justify-center flex-shrink-0">
+            <Play className="w-6 h-6 text-white" />
+          </div>
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold">Focus Flow</h3>
+            <p className="text-gray-200 text-sm">Deep concentration soundtrack</p>
+          </div>
+          <button className="mr-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-2 hover:scale-105">
+            <Play className="w-4 h-4 text-black" />
+          </button>
+        </div>
+      </Link>
+    </div>
+  )}
+</section>
 
                 <section className="mb-8">
                   <div className="flex items-center justify-between mb-4">
