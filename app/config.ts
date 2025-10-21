@@ -1,11 +1,11 @@
 import { createConfig, http } from "wagmi";
-import { blastSepolia } from "wagmi/chains";
+import { arbitrumSepolia } from "wagmi/chains";
 
 export const WagmiConfig = createConfig({
-  chains: [blastSepolia],
+  chains: [arbitrumSepolia],
   ssr: true,
   transports: {
-    [blastSepolia.id]: http(),
+    [arbitrumSepolia.id]: http(),
   },
   multiInjectedProviderDiscovery: true,
 });

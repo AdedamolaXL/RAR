@@ -1,1 +1,3 @@
 export const NFTGrowtthAddress = "0xBD085Af199eCa0b38275B47D2DE19d5e1A9767dD"
+export const RandomSeedAddress = "0xA13C674F8A8715E157BA42237A6b1Dff24EE274F"
+export const CoinFlipAddress = "0x762353AdF1342ba85f6dDEac0446E2DA43ab84bf"
