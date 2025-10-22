@@ -71,22 +71,23 @@ export async function POST(request: NextRequest) {
     
     // Create battle instance in database
     const { data: battleInstance, error: dbError } = await supabase
-      .from('playlist_battle_instances')
-      .insert({
-        user_id: user.id,
-        playlist_prompt_id: playlistPromptId,
-        random_seed: randomNumber,
-        coin_flip_result: coinFlipResult,
-        initial_seed_count: initialSeedCount,
-        library_songs: librarySongs.map(song => song.id),
-        playlist_songs: playlistSongs.map(song => song.id),
-        queue_songs: queueSongs.map(song => song.id)
-      })
-      .select(`
-        *,
-        playlist_prompt:playlist_battle_prompts(*)
-      `)
-      .single()
+  .from('playlist_battle_instances')
+  .insert({
+    user_id: user.id,
+    playlist_prompt_id: playlistPromptId,
+    random_seed: randomNumber, // This should already be a hex string like "0x..."
+    coin_flip_result: coinFlipResult,
+    initial_seed_count: initialSeedCount,
+    library_songs: librarySongs.map(song => song.id),
+    playlist_songs: playlistSongs.map(song => song.id),
+    queue_songs: queueSongs.map(song => song.id)
+  })
+  .select(`
+    *,
+    playlist_prompt:playlist_battle_prompts(*)
+  `)
+  .single()
+
     
     if (dbError) {
       console.error('❌ Database error:', dbError)

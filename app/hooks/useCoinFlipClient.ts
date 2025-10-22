@@ -35,7 +35,13 @@ export const useCoinFlipClient = () => {
       console.log('📍 Contract:', CoinFlipAddress)
       console.log('👤 User:', address)
       
-      const fee = feeData || parseEther("0.0005") // Default fallback
+      // Ensure fee is a bigint (writeContractAsync expects bigint for value)
+      const fee: bigint = typeof feeData === 'bigint'
+        ? feeData
+        : (typeof feeData === 'string'
+          ? BigInt(feeData)
+          : parseEther('0.0005')) // Default fallback
+      
       console.log('💰 Required fee:', fee.toString(), 'wei')
       
       // Call requestRandom on the CoinFlip contract
@@ -63,36 +69,39 @@ export const useCoinFlipClient = () => {
   }, [address, writeContractAsync, feeData])
 
   const getUserResult = useCallback(async (): Promise<{
-    randomNumber: string
-    isHeads: boolean
-    timestamp: number
-    exists: boolean
-  } | null> => {
-    if (!address) {
-      setError('No wallet connected')
-      return null
-    }
+  randomNumber: string
+  isHeads: boolean
+  timestamp: number
+  exists: boolean
+} | null> => {
+  if (!address) {
+    setError('No wallet connected')
+    return null
+  }
 
-    try {
-      console.log('📊 Checking user result for:', address)
-      
-      // Use ethers to read from contract (server-side via API)
-      const response = await fetch(`/api/coin-flip/result/${address}`)
-      const data = await response.json()
-      
-      if (!data.success) {
-        throw new Error(data.error)
-      }
-      
-      console.log('✅ User result:', data.result)
-      return data.result
-      
-    } catch (err: any) {
-      console.error('❌ Error getting user result:', err)
-      setError(err.message)
-      return null
+  try {
+    console.log('📊 Checking user result for:', address)
+    
+    const response = await fetch(`/api/coin-flip/result/${address}`)
+    const data = await response.json()
+    
+    if (!data.success) {
+      throw new Error(data.error)
     }
-  }, [address])
+    
+    console.log('✅ User result format:')
+    console.log('Random number:', data.result.randomNumber)
+    console.log('Type:', typeof data.result.randomNumber)
+    console.log('Is hex:', data.result.randomNumber.startsWith('0x'))
+    
+    return data.result
+    
+  } catch (err: any) {
+    console.error('❌ Error getting user result:', err)
+    setError(err.message)
+    return null
+  }
+}, [address])
 
   const hasUserResult = useCallback(async (): Promise<boolean> => {
     if (!address) {

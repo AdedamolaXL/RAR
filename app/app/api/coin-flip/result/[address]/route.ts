@@ -18,10 +18,15 @@ export async function GET(
     
     const result = await contract.getUserResult(userAddress)
     
+    // Log the format for debugging
+    console.log('🔍 Raw contract result:', result)
+    console.log('Random number format:', result[0])
+    console.log('Type of random number:', typeof result[0])
+    
     return NextResponse.json({ 
       success: true,
       result: {
-        randomNumber: result[0],
+        randomNumber: result[0], // This should be a hex string like "0x..."
         isHeads: result[1],
         timestamp: Number(result[2]),
         exists: result[3]

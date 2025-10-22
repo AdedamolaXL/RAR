@@ -46,7 +46,8 @@ export const playlistBattleService = {
           initial_seed_count: initialSeedCount,
           library_songs: librarySongs.map(song => song.id),
           playlist_songs: playlistSongs.map(song => song.id),
-          queue_songs: queueSongs.map(song => song.id)
+          queue_songs: queueSongs.map(song => song.id),
+          energy_units: 100 
         })
         .select(`
           *,
@@ -131,11 +132,11 @@ export const playlistBattleService = {
 
   // Add song from queue to playlist
   async addSongToPlaylist(battleInstanceId: string, songId: string): Promise<any> {
-    const { data: battle, error: fetchError } = await supabase
-      .from('playlist_battle_instances')
-      .select('playlist_songs, queue_songs')
-      .eq('id', battleInstanceId)
-      .single()
+  const { data: battle, error: fetchError } = await supabase
+    .from('playlist_battle_instances')
+    .select('playlist_songs, queue_songs, library_songs')
+    .eq('id', battleInstanceId)
+    .single()
     
     if (fetchError) throw fetchError
     
