@@ -1,3 +1,5 @@
+// app/app/api/playlist-battle/[id]/rearrange/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
@@ -7,6 +9,16 @@ export async function POST(
 ) {
   try {
     const battleInstanceId = params.id
+    
+    // Parse request body - songOrder is optional
+    let songOrder: string[] | undefined
+    try {
+      const body = await request.json()
+      songOrder = body.songOrder
+    } catch (e) {
+      // If no body or invalid JSON, songOrder will be undefined (random shuffle)
+      console.log('No song order provided, will use random shuffle')
+    }
 
     // Get current battle instance
     const { data: battle, error: fetchError } = await supabase
@@ -26,11 +38,31 @@ export async function POST(
       }, { status: 400 })
     }
 
-    // Rearrange playlist songs (shuffle them)
-    const shuffledSongs = [...battle.playlist_songs]
-    for (let i = shuffledSongs.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledSongs[i], shuffledSongs[j]] = [shuffledSongs[j], shuffledSongs[i]];
+    // Determine the new song order
+    let reorderedSongs: string[]
+    
+    if (songOrder && Array.isArray(songOrder) && songOrder.length > 0) {
+      // Manual rearrangement - validate that the provided order contains the same songs
+      const originalSet = new Set(battle.playlist_songs)
+      const newSet = new Set(songOrder)
+      
+      if (originalSet.size !== newSet.size ||
+          !battle.playlist_songs.every((id: string) => newSet.has(id))) {
+        return NextResponse.json({
+          error: 'Invalid song order provided. Song IDs do not match.'
+        }, { status: 400 })
+      }
+      
+      reorderedSongs = songOrder
+      console.log('📋 Manual rearrangement applied')
+    } else {
+      // Random shuffle (fallback)
+      reorderedSongs = [...battle.playlist_songs]
+      for (let i = reorderedSongs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [reorderedSongs[i], reorderedSongs[j]] = [reorderedSongs[j], reorderedSongs[i]]
+      }
+      console.log('🎲 Random shuffle applied')
     }
 
     // Add 2 energy units
@@ -40,7 +72,7 @@ export async function POST(
     const { data: updatedBattle, error: updateError } = await supabase
       .from('playlist_battle_instances')
       .update({ 
-        playlist_songs: shuffledSongs,
+        playlist_songs: reorderedSongs,
         energy_units: newEnergy,
         updated_at: new Date().toISOString()
       })
@@ -55,6 +87,8 @@ export async function POST(
       throw updateError
     }
 
+    console.log('✅ Playlist rearranged successfully')
+    
     return NextResponse.json({ 
       success: true, 
       updatedBattle,
@@ -63,7 +97,7 @@ export async function POST(
     })
     
   } catch (error: any) {
-    console.error('Error rearranging playlist:', error)
+    console.error('❌ Error rearranging playlist:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to rearrange playlist' },
       { status: 500 }

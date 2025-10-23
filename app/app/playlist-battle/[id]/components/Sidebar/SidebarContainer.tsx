@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react'
 import { BattleInstance, Song, RevealResult } from '@/app/playlist-battle/[id]/types/playlist-battle'
 import { RevealCard } from './RevealCard'
 import { EnergyBar } from './EnergyBar' 
+import { Trophy, Upload } from 'lucide-react'
 
 interface SidebarContainerProps {
   battleInstance: BattleInstance
@@ -24,6 +25,9 @@ interface SidebarContainerProps {
   hasPlaylistSongs: boolean // Add this
   onRearrangePlaylist: () => void // Add this
   onPause: () => void 
+  onSubmitToGallery: () => void
+  isSubmitting: boolean
+  canSubmit: boolean
 }
 
 export const SidebarContainer = ({
@@ -47,6 +51,9 @@ export const SidebarContainer = ({
   hasPlaylistSongs, // Add this
   onRearrangePlaylist, // Add this
   onPause,
+  onSubmitToGallery,
+  isSubmitting,
+  canSubmit
 }: SidebarContainerProps) => {
   const attemptsLeft = (battleInstance.random_seed?.slice(2).length || 0) - currentSeedIndex
 
@@ -60,7 +67,34 @@ export const SidebarContainer = ({
         <h2 className="text-xl font-bold">Song Queue</h2>
        </div>
        
-        <EnergyBar energyUnits={energyUnits} />
+       <EnergyBar energyUnits={energyUnits} />
+       
+    
+<div className="mt-6 p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
+  <button
+    onClick={onSubmitToGallery}
+    disabled={!canSubmit || isSubmitting}
+    className="w-full flex items-center justify-center space-x-2 bg-white text-black py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    {isSubmitting ? (
+      <div className="animate-spin">⟳</div>
+    ) : (
+      <>
+        <Trophy className="w-5 h-5" />
+        <span>Submit to Gallery</span>
+      </>
+    )}
+  </button>
+        
+         <div className="mt-2 text-xs text-white/80 text-center">
+    {!canSubmit ? (
+      <p>Add songs to your playlist to submit</p>
+    ) : (
+      <p>Share your creation with the community</p>
+    )}
+  </div>
+      </div>
+
 
        {/* Centered Reveal Card */}
       <div className="flex-1 flex items-center justify-center">

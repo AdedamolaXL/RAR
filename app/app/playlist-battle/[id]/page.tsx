@@ -1,6 +1,8 @@
+// app/app/playlist-battle/[id]/page.tsx
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useBattleInstance } from '@/app/playlist-battle/[id]/components/hooks/useBattleInstance'
 import { useRevealLogic } from '@/app/playlist-battle/[id]/components/hooks/useRevealLogic'
 import { useAudioPlayer } from '@/app/playlist-battle/[id]/components/hooks/useAudioPlayer'
@@ -10,7 +12,11 @@ import { PlaylistControls } from '@/app/playlist-battle/[id]/components/MainCont
 import { SongsList } from '@/app/playlist-battle/[id]/components/MainContent/SongList'
 import { PlayerBar } from '@/app/playlist-battle/[id]/PlayerBar'
 import { LoadingState } from '@/app/playlist-battle/[id]/LoadingState'
+import { RearrangeModal } from '@/app/playlist-battle/[id]/RearrangeModal'
 import { useBattleEnergy } from '@/hooks/useBattleEnergy'
+import { useAccount } from 'wagmi'
+import { useUser } from '@/contexts/UserContext'
+
 
 interface PlaylistBattlePageProps {
   params: {
@@ -20,8 +26,13 @@ interface PlaylistBattlePageProps {
 
 export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) {
   const router = useRouter()
+  const { address } = useAccount() // Add this hook
+  const { user } = useUser() 
+  
+  // NEW: State for rearrange modal
+  const [isRearrangeModalOpen, setIsRearrangeModalOpen] = useState(false)
 
-const {
+  const {
     battleInstance,
     playlistSongs,
     queueSongs,
@@ -29,12 +40,11 @@ const {
     loadBattleInstance,
     addSongToPlaylist,
     passSong,
-    rearrangePlaylist, // Add this
-    pause // Add this
+    rearrangePlaylist,
+    pause
   } = useBattleInstance(params.id)
 
-
-    const {
+  const {
     revealedQueueSongs,
     currentSeedIndex,
     isFlipping,
@@ -52,47 +62,56 @@ const {
   
   const { isPlaying, currentSong, playSong, likeSong } = useAudioPlayer()
   const { energyUnits, consumeEnergy, canAddSong, canPassSong, isLoading: energyLoading } = useBattleEnergy(battleInstance)
-  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const handleAddToPlaylist = async (songId: string) => {
-  if (!canAddSong) {
-    alert('Not enough energy to add song! Need 5 energy units.')
-    return
-  }
+    if (!canAddSong) {
+      alert('Not enough energy to add song! Need 5 energy units.')
+      return
+    }
 
-  const success = await addSongToPlaylist(songId)
-  if (success) {
-    // Energy is updated by the API, so we need to refresh the battle instance
-    await loadBattleInstance()
-    removeSongFromRevealed(songId)
-    console.log('✅ Added song to playlist and consumed 5 energy')
-  } else {
-    alert('Failed to add song. Please try again.')
-  }
-}
-
-const handlePassSong = async (songId: string) => {
-  if (!canPassSong) {
-    alert('Not enough energy to pass song! Need 3 energy units.')
-    return
-  }
-
-  const success = await passSong(songId)
-  if (success) {
-    // Energy is updated by the API, so we need to refresh the battle instance
-    await loadBattleInstance()
-    removeSongFromRevealed(songId)
-    console.log('✅ Passed song and consumed 3 energy')
-  } else {
-    alert('Failed to pass song. Please try again.')
-  }
-}
-  
-   // Add handlers for restorative actions
-  const handleRearrangePlaylist = async () => {
-    const success = await rearrangePlaylist()
+    const success = await addSongToPlaylist(songId)
     if (success) {
-      // Refresh to get updated energy and playlist order
       await loadBattleInstance()
+      removeSongFromRevealed(songId)
+      console.log('✅ Added song to playlist and consumed 5 energy')
+    } else {
+      alert('Failed to add song. Please try again.')
+    }
+  }
+
+  const handlePassSong = async (songId: string) => {
+    if (!canPassSong) {
+      alert('Not enough energy to pass song! Need 3 energy units.')
+      return
+    }
+
+    const success = await passSong(songId)
+    if (success) {
+      await loadBattleInstance()
+      removeSongFromRevealed(songId)
+      console.log('✅ Passed song and consumed 3 energy')
+    } else {
+      alert('Failed to pass song. Please try again.')
+    }
+  }
+  
+  // NEW: Handler to open the rearrange modal
+  const handleOpenRearrangeModal = () => {
+    if (playlistSongs.length === 0) {
+      alert('Add songs to playlist first to rearrange')
+      return
+    }
+    setIsRearrangeModalOpen(true)
+  }
+
+  // NEW: Handler to save the rearranged playlist
+  const handleSaveRearrange = async (reorderedSongIds: string[]) => {
+    const success = await rearrangePlaylist(reorderedSongIds)
+    if (success) {
+      await loadBattleInstance()
+      setIsRearrangeModalOpen(false)
+      flipCardBack() // IMPORTANT: Flip card back to front after action
       console.log('✅ Playlist rearranged and gained 2 energy')
     } else {
       alert('Failed to rearrange playlist. Please try again.')
@@ -102,8 +121,8 @@ const handlePassSong = async (songId: string) => {
   const handlePause = async () => {
     const success = await pause()
     if (success) {
-      // Refresh to get updated energy
       await loadBattleInstance()
+      flipCardBack() // IMPORTANT: Flip card back to front after action
       console.log('✅ Paused and gained 5 energy')
     } else {
       alert('Failed to pause. Please try again.')
@@ -119,6 +138,52 @@ const handlePassSong = async (songId: string) => {
       playSong(playlistSongs[0])
     }
   }
+
+  // Update the handleSubmitToGallery function
+const handleSubmitToGallery = async () => {
+  if (!battleInstance || !address) return
+  
+  // Check if playlist has songs
+  if (playlistSongs.length === 0) {
+    alert('Add at least one song to your playlist before submitting!')
+    return
+  }
+  
+  setIsSubmitting(true)
+  try {
+    const response = await fetch(`/api/playlist-battle/${battleInstance.id}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userAddress: address,
+        playlistName: `My ${battleInstance.playlist_prompt.name}`,
+        playlistDescription: `Created in a playlist battle by ${user?.username}`
+      })
+    })
+    
+    const data = await response.json()
+    
+    if (data.success) {
+      if (data.isResubmission) {
+        alert('This playlist was already submitted to the gallery!')
+        router.push('/playlist-battle/gallery')
+      } else {
+        alert('Playlist submitted to gallery!')
+        router.push('/playlist-battle/gallery')
+      }
+    } else {
+      alert('Failed to submit: ' + data.error)
+    }
+  } catch (error) {
+    console.error('Error submitting playlist:', error)
+    alert('Error submitting playlist')
+  } finally {
+    setIsSubmitting(false)
+  }
+}
+  
+  const canSubmit = playlistSongs.length > 0
+
 
   // Loading state
   if (isLoading) {
@@ -143,58 +208,71 @@ const handlePassSong = async (songId: string) => {
     )
   }
 
-   return (
-    <div className="flex h-full bg-black text-white">
-      {/* Sidebar */}
-     <SidebarContainer
-        battleInstance={battleInstance}
-        revealedQueueSongs={revealedQueueSongs}
-        queueSongs={queueSongs}
-        playlistSongs={playlistSongs}
-        isFlipping={isFlipping}
-        isCardFlipped={isCardFlipped}
-        lastRevealResult={lastRevealResult}
-        canFlipMore={canFlipMore}
-        currentSeedIndex={currentSeedIndex}
-        energyUnits={energyUnits}
-        canAddSong={canAddSong}
-        canPassSong={canPassSong}
-        hasPlaylistSongs={playlistSongs.length > 0} // Pass this
-        onFlip={flipCard}
-        onFlipBack={flipCardBack}
-        onAddToPlaylist={handleAddToPlaylist}
-        onPassSong={handlePassSong}
-        onRearrangePlaylist={handleRearrangePlaylist} // Add this
-        onPause={handlePause} // Add this
-        onBack={() => router.push('/')}
-      />
-       
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <PlaylistHeader
-          playlistPrompt={battleInstance.playlist_prompt}
-          playlistCount={playlistSongs.length}
-          queueCount={queueSongs.length}
+  return (
+    <>
+      <div className="flex h-full bg-black text-white">
+        {/* Sidebar */}
+        <SidebarContainer
+          battleInstance={battleInstance}
+          revealedQueueSongs={revealedQueueSongs}
+          queueSongs={queueSongs}
+          playlistSongs={playlistSongs}
+          isFlipping={isFlipping}
+          isCardFlipped={isCardFlipped}
+          lastRevealResult={lastRevealResult}
+          canFlipMore={canFlipMore}
+          currentSeedIndex={currentSeedIndex}
+          energyUnits={energyUnits}
+          canAddSong={canAddSong}
+          canPassSong={canPassSong}
+          hasPlaylistSongs={playlistSongs.length > 0}
+          onFlip={flipCard}
+          onFlipBack={flipCardBack}
+          onAddToPlaylist={handleAddToPlaylist}
+          onPassSong={handlePassSong}
+          onRearrangePlaylist={handleOpenRearrangeModal} // UPDATED: Opens modal
+          onPause={handlePause}
+          onBack={() => router.push('/')}
+          onSubmitToGallery={handleSubmitToGallery}
+          isSubmitting={isSubmitting}
+          canSubmit={playlistSongs.length > 0}
         />
-
-        <div className="flex-1 p-6 bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
-          <PlaylistControls
-            hasPlaylistSongs={playlistSongs.length > 0}
-            onPlayAll={handlePlayAll}
+        
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <PlaylistHeader
+            playlistPrompt={battleInstance.playlist_prompt}
+            playlistCount={playlistSongs.length}
+            queueCount={queueSongs.length}
           />
 
-          <div className="space-y-2">
-            <SongsList
-              songs={playlistSongs}
-              onPlaySong={playSong}
-              onLikeSong={handleLikeSong}
+          <div className="flex-1 p-6 bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
+            <PlaylistControls
+              hasPlaylistSongs={playlistSongs.length > 0}
+              onPlayAll={handlePlayAll}
             />
+
+            <div className="space-y-2">
+              <SongsList
+                songs={playlistSongs}
+                onPlaySong={playSong}
+                onLikeSong={handleLikeSong}
+              />
+            </div>
           </div>
         </div>
+
+        {/* Player Bar */}
+        {/* <PlayerBar currentSong={currentSong} /> */}
       </div>
 
-      {/* Player Bar */}
-      <PlayerBar currentSong={currentSong} />
-    </div>
+      {/* NEW: Rearrange Modal */}
+      <RearrangeModal
+        isOpen={isRearrangeModalOpen}
+        songs={playlistSongs}
+        onClose={() => setIsRearrangeModalOpen(false)}
+        onSave={handleSaveRearrange}
+      />
+    </>
   )
 }

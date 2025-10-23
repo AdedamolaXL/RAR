@@ -83,8 +83,11 @@ export const useRevealLogic = (randomSeed: string | undefined, queueSongs: Song[
     setIsCardFlipped(false)
   }, [])
 
-  const removeSongFromRevealed = useCallback((songId: string) => {
+   const removeSongFromRevealed = useCallback((songId: string) => {
     setRevealedQueueSongs(prev => prev.filter(song => song.id !== songId))
+    // Clear the last result and flip card back when song is removed
+    setLastRevealResult(null)
+    setIsCardFlipped(false)
   }, [])
 
   const resetRevealState = useCallback(() => {

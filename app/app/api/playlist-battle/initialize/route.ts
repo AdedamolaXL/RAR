@@ -80,7 +80,8 @@ export async function POST(request: NextRequest) {
     initial_seed_count: initialSeedCount,
     library_songs: librarySongs.map(song => song.id),
     playlist_songs: playlistSongs.map(song => song.id),
-    queue_songs: queueSongs.map(song => song.id)
+    queue_songs: queueSongs.map(song => song.id),
+    energy_units: 100
   })
   .select(`
     *,

@@ -1,3 +1,5 @@
+// app/app/playlist-battle/[id]/components/Sidebar/RevealCard.tsx
+
 import { Play, Plus, Eye, EyeOff, X, SkipForward, RefreshCw, Pause } from 'lucide-react'
 import { RevealResult } from '@/app/playlist-battle/[id]/types/playlist-battle'
 
@@ -9,13 +11,13 @@ interface RevealCardProps {
   attemptsLeft: number
   revealedCount: number
   totalQueueSongs: number
-  hasPlaylistSongs: boolean // Add this to check if rearrangement is possible
+  hasPlaylistSongs: boolean
   onFlip: () => void
   onFlipBack: () => void
   onAddToPlaylist: (songId: string) => void
   onPassSong: (songId: string) => void
-  onRearrangePlaylist: () => void // Add this
-  onPause: () => void // Add this
+  onRearrangePlaylist: () => void // This now opens the modal
+  onPause: () => void
 }
 
 export const RevealCard = ({
@@ -26,17 +28,17 @@ export const RevealCard = ({
   attemptsLeft,
   revealedCount,
   totalQueueSongs,
-  hasPlaylistSongs, // Add this
+  hasPlaylistSongs,
   onFlip,
   onFlipBack,
   onAddToPlaylist,
   onPassSong,
-  onRearrangePlaylist, // Add this
-  onPause // Add this
+  onRearrangePlaylist,
+  onPause
 }: RevealCardProps) => {
   console.log('🎴 Card State:', { isCardFlipped, isFlipping })
 
-   const handleCardClick = () => {
+  const handleCardClick = () => {
     if (isFlipping) return;
     
     if (isCardFlipped) {
@@ -48,8 +50,7 @@ export const RevealCard = ({
     }
   }
 
-
-   return (
+  return (
     <div>
       <div 
         className={`relative w-full h-64 ${isFlipping ? 'pointer-events-none' : ''}`} 
@@ -116,7 +117,6 @@ export const RevealCard = ({
                 <p className="text-center font-semibold text-base mb-1">{lastRevealResult.song.title}</p>
                 <p className="text-center text-white/80 text-sm mb-6">{lastRevealResult.song.artist}</p>
 
-                
                 {/* Action Buttons */}
                 <div className="flex space-x-3 w-full max-w-xs">
                   <button 
@@ -157,7 +157,7 @@ export const RevealCard = ({
                   <button 
                     onClick={(e) => {
                       e.stopPropagation()
-                      onRearrangePlaylist()
+                      onRearrangePlaylist() // This will now open the modal
                     }}
                     disabled={!hasPlaylistSongs}
                     className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center space-x-1 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -191,6 +191,5 @@ export const RevealCard = ({
         </div>
       </div>
     </div>
-
   )
 }
