@@ -5,27 +5,9 @@ import { useEffect, useState } from 'react'
 import { Play, Heart, Share, ArrowLeft, Users, Clock, Battery } from 'lucide-react'
 import { songService } from '@/services/songService'
 import { supabase } from '@/lib/supabase'
+import { VoteButtons } from '@/components/playlist/VoteButton'
+import { GalleryPlaylist } from '@/types/gallery'
 
-interface GalleryPlaylist {
-  id: string
-  playlist_name: string
-  playlist_description: string
-  playlist_songs: string[]
-  energy_remaining: number
-  likes: number
-  play_count: number
-  submitted_at: string
-  user: {
-    username: string
-    wallet_address: string
-  }
-  playlist_prompt: {
-    id: string
-    name: string
-    description: string
-    color_gradient: string
-  }
-}
 
 export default function GalleryPlaylistPage() {
   const params = useParams()
@@ -43,35 +25,41 @@ export default function GalleryPlaylistPage() {
   }, [playlistId])
 
   const loadPlaylistData = async () => {
-    try {
-      setIsLoading(true)
+  try {
+    setIsLoading(true)
+    
+    // Fetch playlist data
+    const response = await fetch(`/api/playlist-battle/gallery/${playlistId}`)
+    const data = await response.json()
+    
+    if (data.success) {
+      setPlaylist(data.playlist)
       
-      // Fetch playlist data
-      const response = await fetch(`/api/playlist-battle/gallery/${playlistId}`)
-      const data = await response.json()
+      // Load all songs to map IDs to song objects
+      const allSongs = await songService.getSongs()
+      const songMap = new Map(allSongs.map(song => [song.id, song]))
       
-      if (data.success) {
-        setPlaylist(data.playlist)
-        
-        // Load all songs to map IDs to song objects
-        const allSongs = await songService.getSongs()
-        const songMap = new Map(allSongs.map(song => [song.id, song]))
-        
-        const playlistSongs = data.playlist.playlist_songs
-          .map((songId: string) => songMap.get(songId))
-          .filter(Boolean)
-        
-        setSongs(playlistSongs)
-        
-        // Increment play count when someone views the playlist
-        await incrementPlayCount()
-      }
-    } catch (error) {
-      console.error('Error loading playlist:', error)
-    } finally {
-      setIsLoading(false)
+      // Ensure playlist_songs exists and is an array
+      const playlistSongs = (data.playlist.playlist_songs || [])
+        .map((songId: string) => songMap.get(songId))
+        .filter(Boolean)
+      
+      setSongs(playlistSongs)
+      
+      // Increment play count when someone views the playlist
+      await incrementPlayCount()
+    } else {
+      console.error('Failed to load playlist:', data.error)
+      setError('Failed to load playlist')
     }
+  } catch (error) {
+    console.error('Error loading playlist:', error)
+    setError('Error loading playlist')
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   const incrementPlayCount = async () => {
     try {
@@ -232,14 +220,39 @@ export default function GalleryPlaylistPage() {
             <h1 className="text-5xl font-bold mt-2 mb-4">{playlist.playlist_name}</h1>
             <p className="text-gray-300 text-lg">{playlist.playlist_description}</p>
             <div className="flex items-center space-x-2 mt-4 text-sm text-gray-300">
-              <span>Battle: {playlist.playlist_prompt.name}</span>
-              <span>•</span>
-              <span>{songs.length} songs</span>
-              <span>•</span>
-              <span>{playlist.likes} likes</span>
-              <span>•</span>
-              <span>{playlist.play_count} plays</span>
+  <span>Battle: {playlist.playlist_prompt.name}</span>
+  <span>•</span>
+  <span>{songs.length} songs</span>
+  <span>•</span>
+  <span>{playlist.likes} likes</span>
+  <span>•</span>
+  <span>{playlist.play_count} plays</span>
             </div>
+            
+            {/* Add voting section */}
+<div className="mt-4 flex items-center justify-between">
+  <div className="flex items-center space-x-4">
+    <VoteButtons 
+      playlistId={playlist.id}
+      currentVoteCount={playlist.vote_count || 0}
+      playlistOwner={playlist.user.wallet_address}
+      onVoteUpdate={(newCount) => {
+        // Update local state if needed
+        setPlaylist(prev => prev ? { ...prev, vote_count: newCount } : null)
+      }}
+    />
+              </div>
+              
+
+               {/* Display reputation level if available */}
+  {playlist.user.reputation_level > 0 && (
+    <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 px-3 py-1 rounded-full">
+      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+      <span className="text-xs font-semibold">Level {playlist.user.reputation_level}</span>
+    </div>
+  )}
+            </div>
+            
           </div>
         </div>
 
@@ -366,4 +379,8 @@ export default function GalleryPlaylistPage() {
       )}
     </div>
   )
+}
+
+function setError(arg0: string) {
+  throw new Error('Function not implemented.')
 }

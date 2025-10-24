@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { userService } from '@/services/userService'
 
 export async function GET(request: Request) {
   try {
@@ -11,14 +10,19 @@ export async function GET(request: Request) {
       .from('gallery_playlists')
       .select(`
         *,
-        user:users(username, wallet_address),
+        user:users(username, wallet_address, reputation_level),
         playlist_prompt:playlist_battle_prompts(*)
       `)
       .order('submitted_at', { ascending: false })
 
-    // If user address provided, filter by user
+    // Only filter by user if specifically requested
     if (userAddress) {
-      const user = await userService.getUserByWalletAddress(userAddress.toLowerCase())
+      const { data: user } = await supabase
+        .from('users')
+        .select('id')
+        .eq('wallet_address', userAddress.toLowerCase())
+        .single()
+
       if (user) {
         query = query.eq('user_id', user.id)
       }
@@ -30,8 +34,14 @@ export async function GET(request: Request) {
       throw error
     }
 
+    // Ensure all playlists have playlist_songs as array
+    const safePlaylists = (galleryPlaylists || []).map(playlist => ({
+      ...playlist,
+      playlist_songs: Array.isArray(playlist.playlist_songs) ? playlist.playlist_songs : []
+    }))
+
     // Group by playlist prompt
-    const groupedPlaylists = galleryPlaylists?.reduce((acc: any, playlist) => {
+    const groupedPlaylists = safePlaylists.reduce((acc: any, playlist) => {
       const promptId = playlist.playlist_prompt_id
       if (!acc[promptId]) {
         acc[promptId] = {
@@ -46,7 +56,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       success: true, 
       galleryPlaylists: groupedPlaylists || {},
-      totalCount: galleryPlaylists?.length || 0
+      totalCount: safePlaylists.length
     })
 
   } catch (error: any) {
