@@ -131,41 +131,48 @@ export const playlistBattleService = {
   },
 
   // Add song from queue to playlist
-  async addSongToPlaylist(battleInstanceId: string, songId: string): Promise<any> {
+ async addSongToPlaylist(battleInstanceId: string, songId: string): Promise<any> {
   const { data: battle, error: fetchError } = await supabase
     .from('playlist_battle_instances')
-    .select('playlist_songs, queue_songs, library_songs')
+    .select('playlist_songs, queue_songs, energy_units')
     .eq('id', battleInstanceId)
     .single()
     
-    if (fetchError) throw fetchError
-    
-    // Check if song exists in queue
-    if (!battle.queue_songs.includes(songId)) {
-      throw new Error('Song not found in queue')
-    }
-    
-    // Remove from queue and add to playlist
-    const updatedQueue = battle.queue_songs.filter((id: string) => id !== songId)
-    const updatedPlaylist = [...battle.playlist_songs, songId]
-    
-    const { data: updatedBattle, error: updateError } = await supabase
-      .from('playlist_battle_instances')
-      .update({
-        playlist_songs: updatedPlaylist,
-        queue_songs: updatedQueue,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', battleInstanceId)
-      .select(`
-        *,
-        playlist_prompt:playlist_battle_prompts(*)
-      `)
-      .single()
-    
-    if (updateError) throw updateError
-    return updatedBattle
-  },
+  if (fetchError) throw fetchError
+  
+  // Check if song exists in queue
+  if (!battle.queue_songs.includes(songId)) {
+    throw new Error('Song not found in queue')
+  }
+  
+  // Check energy
+  if (battle.energy_units < 5) {
+    throw new Error('Not enough energy to add song')
+  }
+  
+  // Remove from queue and add to playlist, and update energy
+  const updatedQueue = battle.queue_songs.filter((id: string) => id !== songId)
+  const updatedPlaylist = [...battle.playlist_songs, songId]
+  const newEnergy = battle.energy_units - 5
+  
+  const { data: updatedBattle, error: updateError } = await supabase
+    .from('playlist_battle_instances')
+    .update({
+      playlist_songs: updatedPlaylist,
+      queue_songs: updatedQueue,
+      energy_units: newEnergy,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', battleInstanceId)
+    .select(`
+      *,
+      playlist_prompt:playlist_battle_prompts(*)
+    `)
+    .single()
+  
+  if (updateError) throw updateError
+  return updatedBattle
+},
 
   // Get available playlist battle prompts (similar to playlist_definitions)
   async getPlaylistBattlePrompts(): Promise<any[]> {

@@ -51,34 +51,11 @@ const playSong = (song: any) => {
 
   return (
     <div className="flex h-full bg-black text-white">
-      {/* Sidebar */}
-      <div className="w-64 bg-black p-6 flex flex-col">
-        <div className="mb-8">
-          <Link href="/" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
-          </Link>
-        </div>
-        
-        <nav className="space-y-6 flex-1">
-          {/* Your existing sidebar navigation */}
-        </nav>
-      </div>
+      
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <header className="bg-gradient-to-b from-green-900 to-black p-6 flex items-center justify-between">
-          <div className="flex space-x-4">
-            <button className="w-8 h-8 bg-black bg-opacity-70 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all">
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <Wallet />
-          </div>
-        </header>
+        
 
         {/* Playlist Header */}
         <div className="bg-gradient-to-b from-green-900 to-gray-900 p-6 flex items-end space-x-6">
@@ -88,7 +65,7 @@ const playSong = (song: any) => {
             <h1 className="text-5xl font-bold mt-2 mb-4">{playlist.name}</h1>
             <p className="text-gray-300">{playlist.description}</p>
             <div className="flex items-center space-x-2 mt-4 text-sm text-gray-300">
-              <span>NFTune</span>
+              <span>RAR</span>
               <span>•</span>
               <span>{playlist.songs.length} songs</span>
             </div>
@@ -154,7 +131,7 @@ const playSong = (song: any) => {
         </div>
       </div>
 
-      {/* Player Bar (same as homepage) */}
+    
     </div>
   )
 }

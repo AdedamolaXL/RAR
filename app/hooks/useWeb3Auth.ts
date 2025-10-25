@@ -22,7 +22,7 @@ export const useWeb3Auth = () => {
 
     try {
       // Generate a sign-in message
-      const message = `Sign in to NFTune at ${new Date().toISOString()}`
+      const message = `Sign in to RAR at ${new Date().toISOString()}`
       
       // Sign the message with the wallet
       const signature = await signMessageAsync({ message })

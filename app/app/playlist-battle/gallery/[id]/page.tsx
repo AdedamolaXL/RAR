@@ -175,35 +175,8 @@ export default function GalleryPlaylistPage() {
 
   return (
     <div className="flex h-full bg-black text-white">
-      {/* Sidebar */}
-      <div className="w-64 bg-black p-6 flex flex-col">
-        <div className="mb-8">
-          <button 
-            onClick={() => router.push('/playlist-battle/gallery')}
-            className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back to Gallery</span>
-          </button>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <div className="flex items-center space-x-2 text-sm text-gray-300 mb-2">
-              <Users className="w-4 h-4" />
-              <span>by {playlist.user.username}</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-300 mb-2">
-              <Clock className="w-4 h-4" />
-              <span>{formatTimeAgo(playlist.submitted_at)}</span>
-            </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-300">
-              <Battery className="w-4 h-4" />
-              <span>{playlist.energy_remaining} energy left</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
+      
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

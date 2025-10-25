@@ -7,28 +7,25 @@ import {IEntropyConsumer} from "@pythnetwork/entropy-sdk-solidity/IEntropyConsum
 import {IEntropy} from "@pythnetwork/entropy-sdk-solidity/IEntropy.sol";
 
 contract PlaylistReputationNFT is ERC721A, Ownable, IEntropyConsumer {
-    // Core NFT data
     struct PlaylistInfo {
         string name;
         string playlistId;
-        uint256 reputation; // 0-100 scale
+        uint256 reputation; 
         uint256 createdAt;
         bool isActive;
     }
-    
-    // Entropy for random decay
+
     IEntropy entropy;
     address entropyProvider;
     
-    // Mappings
     mapping(uint256 => PlaylistInfo) public playlists;
-    mapping(uint64 => uint256) public pendingDecayRequests; // sequenceNumber -> tokenId
-    mapping(address => mapping(uint256 => bool)) public hasVoted; // user -> tokenId -> voted
+    mapping(uint64 => uint256) public pendingDecayRequests; 
+    mapping(address => mapping(uint256 => bool)) public hasVoted; 
     
-    // Constants
+
     uint256 public constant MAX_REPUTATION = 100;
     uint256 public constant GROWTH_PER_VOTE = 5;
-    uint256 public constant DECAY_CHANCE = 30; // 30% chance of decay
+    uint256 public constant DECAY_CHANCE = 30; 
     
     event PlaylistMinted(uint256 indexed tokenId, string name, string playlistId);
     event ReputationGrown(uint256 indexed tokenId, uint256 newReputation, address voter);
@@ -39,8 +36,6 @@ contract PlaylistReputationNFT is ERC721A, Ownable, IEntropyConsumer {
         entropy = IEntropy(_entropy);
         entropyProvider = _provider;
     }
-
-    // ========== DETERMINISTIC GROWTH ==========
     
     function mintPlaylist(address to, string calldata name, string calldata playlistId) external returns (uint256) {
         uint256 tokenId = _nextTokenId();
@@ -75,8 +70,6 @@ contract PlaylistReputationNFT is ERC721A, Ownable, IEntropyConsumer {
         hasVoted[msg.sender][tokenId] = true;
         emit ReputationGrown(tokenId, playlist.reputation, msg.sender);
     }
-
-    // ========== RANDOM DECAY ==========
     
     function triggerDecay(uint256 tokenId) external payable {
         require(_exists(tokenId), "Playlist does not exist");
@@ -121,8 +114,6 @@ contract PlaylistReputationNFT is ERC721A, Ownable, IEntropyConsumer {
     function getEntropy() internal view override returns (address) {
         return address(entropy);
     }
-
-    // ========== UTILITY FUNCTIONS ==========
     
     function getPlaylistInfo(uint256 tokenId) external view returns (PlaylistInfo memory) {
         require(_exists(tokenId), "Playlist does not exist");

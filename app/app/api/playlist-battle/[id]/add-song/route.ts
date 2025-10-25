@@ -1,6 +1,7 @@
 // app/app/api/playlist-battle/[id]/add-song/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { playlistBattleService } from '@/services/playlistBattleService'
+import { supabase } from '@/lib/supabase'
+import { songService } from '@/services/songService'
 
 export async function POST(
   request: NextRequest,
@@ -14,13 +15,72 @@ export async function POST(
       return NextResponse.json({ error: 'Song ID is required' }, { status: 400 })
     }
 
-    const updatedBattle = await playlistBattleService.addSongToPlaylist(battleInstanceId, songId)
-    const battleSongs = await playlistBattleService.getBattleSongs(battleInstanceId)
+    // Get current battle instance
+    const { data: battle, error: fetchError } = await supabase
+      .from('playlist_battle_instances')
+      .select('playlist_songs, queue_songs, energy_units')
+      .eq('id', battleInstanceId)
+      .single()
+
+    if (fetchError) {
+      throw fetchError
+    }
+
+    // Check if song exists in queue
+    if (!battle.queue_songs.includes(songId)) {
+      return NextResponse.json({ error: 'Song not found in queue' }, { status: 400 })
+    }
+
+    // Check if enough energy (5 units for adding)
+    if (battle.energy_units < 5) {
+      return NextResponse.json({ 
+        error: 'Not enough energy to add song' 
+      }, { status: 400 })
+    }
+
+    // Remove song from queue and add to playlist, and update energy
+    const updatedQueue = battle.queue_songs.filter((id: string) => id !== songId)
+    const updatedPlaylist = [...battle.playlist_songs, songId]
+    const newEnergy = battle.energy_units - 5
+
+    // Update the battle instance
+    const { data: updatedBattle, error: updateError } = await supabase
+      .from('playlist_battle_instances')
+      .update({ 
+        playlist_songs: updatedPlaylist,
+        queue_songs: updatedQueue,
+        energy_units: newEnergy,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', battleInstanceId)
+      .select(`
+        *,
+        playlist_prompt:playlist_battle_prompts(*)
+      `)
+      .single()
+
+    if (updateError) {
+      throw updateError
+    }
+
+    // Get updated song data
+    const allSongs = await songService.getSongs()
+    const songMap = new Map(allSongs.map(song => [song.id, song]))
     
+    const playlistSongs = updatedPlaylist
+      .map((songId: string) => songMap.get(songId))
+      .filter(Boolean)
+
+    const queueSongs = updatedQueue
+      .map((songId: string) => songMap.get(songId))
+      .filter(Boolean)
+
     return NextResponse.json({ 
       success: true, 
       updatedBattle,
-      ...battleSongs
+      playlistSongs,
+      queueSongs,
+      energy_units: newEnergy
     })
     
   } catch (error: any) {

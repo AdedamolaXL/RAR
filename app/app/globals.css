@@ -109,3 +109,41 @@
 .rotate-y-0 {
   transform: rotateY(0deg);
 }
+
+.main-content-with-player {
+  height: calc(100vh - 80px); /* Adjust based on your player bar height */
+  overflow-y: auto;
+}
+
+.sidebar-with-player {
+  height: calc(100vh - 80px); /* Adjust based on your player bar height */
+}
+
+/* Ensure proper flex behavior for scrolling */
+.flex-scroll-container {
+  flex: 1;
+  min-height: 0; /* Crucial for flex children to scroll properly */
+  overflow-y: auto;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.rotate-y-0 {
+  transform: rotateY(0deg);
+}
+
+/* Smooth transitions for 3D transforms */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}

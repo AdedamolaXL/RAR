@@ -5,15 +5,12 @@ import "@pythnetwork/entropy-sdk-solidity/IEntropyV2.sol";
 import "@pythnetwork/entropy-sdk-solidity/IEntropyConsumer.sol";
 
 contract CoinFlip is IEntropyConsumer {
-    // Events
     event RandomRequest(uint64 sequenceNumber, address user);
     event RandomResult(address user, bytes32 randomNumber, bool isHeads);
-    
-    // Contract state
+
     IEntropyV2 private entropy;
     address private entropyProvider;
-    
-    // Storage for latest results - one entry per user
+
     struct UserResult {
         bytes32 randomNumber;
         bool isHeads;
@@ -24,7 +21,6 @@ contract CoinFlip is IEntropyConsumer {
     mapping(uint64 => address) public requestToUser;
     mapping(address => UserResult) public userLatestResult;
     
-    // Errors
     error InsufficientFee();
 
     constructor(address _entropy, address _entropyProvider) {
@@ -44,7 +40,6 @@ contract CoinFlip is IEntropyConsumer {
 
         uint64 sequenceNumber = entropy.requestV2{value: fee}();
         
-        // Store which user made this request
         requestToUser[sequenceNumber] = msg.sender;
         
         emit RandomRequest(sequenceNumber, msg.sender);
@@ -58,16 +53,16 @@ contract CoinFlip is IEntropyConsumer {
      */
     function entropyCallback(
         uint64 sequenceNumber,
-        address, // provider - unused but required by interface
+        address, 
         bytes32 randomNumber
     ) internal override {
         address user = requestToUser[sequenceNumber];
         require(user != address(0), "Invalid request");
         
-        // Calculate heads/tails (randomNumber % 2)
+
         bool isHeads = uint256(randomNumber) % 2 == 0;
         
-        // Overwrite the previous result with the new one
+
         userLatestResult[user] = UserResult({
             randomNumber: randomNumber,
             isHeads: isHeads,
@@ -75,13 +70,11 @@ contract CoinFlip is IEntropyConsumer {
             exists: true
         });
         
-        // Clean up the request mapping
+
         delete requestToUser[sequenceNumber];
         
         emit RandomResult(user, randomNumber, isHeads);
     }
-
-    // ========== VIEW FUNCTIONS ==========
 
     /**
      * @dev Get the latest result for a user

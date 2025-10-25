@@ -31,29 +31,29 @@ export const useBattleInstance = (battleId: string) => {
   }
 
   const addSongToPlaylist = async (songId: string) => {
-    try {
-      const response = await fetch(`/api/playlist-battle/${battleId}/add-song`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ songId })
-      })
-      
-      const data = await response.json()
-      if (data.success) {
-        setBattleInstance(data.updatedBattle)
-        setPlaylistSongs(data.playlistSongs || [])
-        setQueueSongs(data.queueSongs || [])
-        console.log('✅ Added song to playlist')
-        return true
-      } else {
-        console.error('Failed to add song:', data.error)
-        return false
-      }
-    } catch (error) {
-      console.error('Error adding song to playlist:', error)
+  try {
+    const response = await fetch(`/api/playlist-battle/${battleId}/add-song`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ songId })
+    })
+    
+    const data = await response.json()
+    if (data.success) {
+      setBattleInstance(data.updatedBattle)
+      setPlaylistSongs(data.playlistSongs || [])
+      setQueueSongs(data.queueSongs || [])
+      console.log('✅ Added song to playlist and consumed 5 energy')
+      return true
+    } else {
+      console.error('Failed to add song:', data.error)
       return false
     }
+  } catch (error) {
+    console.error('Error adding song to playlist:', error)
+    return false
   }
+}
 
   const passSong = async (songId: string) => {
     try {
