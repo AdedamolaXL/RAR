@@ -9,6 +9,8 @@ import PLAYLIST_REPUTATION_NFT_ABI from '@/contracts/PlaylistReputationNFT.json'
 const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc"
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }

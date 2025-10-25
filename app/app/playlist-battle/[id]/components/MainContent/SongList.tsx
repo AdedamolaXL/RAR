@@ -37,7 +37,7 @@ export const SongsList = ({
         <div className="col-span-1">#</div>
         <div className="col-span-6">TITLE</div>
         <div className="col-span-3">ALBUM</div>
-        <div className="col-span-2 text-right">DURATION</div>
+        {/* <div className="col-span-2 text-right">DURATION</div> */}
       </div>
       
       {/* Songs List - Scrollable */}
@@ -85,7 +85,7 @@ export const SongsList = ({
               >
                 <MoreHorizontal className="w-4 h-4" />
               </button>
-              <p className="text-gray-400 text-sm">{formatDuration(song.duration)}</p>
+              {/* <p className="text-gray-400 text-sm">{formatDuration(song.duration)}</p> */}
             </div>
           </div>
         ))}

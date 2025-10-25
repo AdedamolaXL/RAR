@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server'
 import { playlistBattleService } from '@/services/playlistBattleService'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const prompts = await playlistBattleService.getPlaylistBattlePrompts()

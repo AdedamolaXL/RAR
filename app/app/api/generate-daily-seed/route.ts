@@ -12,6 +12,8 @@ const CONTRACT_ADDRESS = "0xA13C674F8A8715E157BA42237A6b1Dff24EE274F"
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY
 const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     console.log('Connecting to RPC:', RPC_URL)

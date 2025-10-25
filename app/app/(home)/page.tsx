@@ -6,7 +6,7 @@ import { Wallet } from "@/components/wagmi/components/wallet"
 import { Play, Plus, MoreHorizontal } from "lucide-react"
 import { UploadSong } from "@/components/media/upload-song"
 import { RecentlyUploaded } from "@/components/media/recently-uploaded"
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { randomSeedService } from '@/services/randomSeedService'
 import { usePlaylistBattle } from '@/hooks/usePlaylistBattle'
 import { useAccount } from 'wagmi'
@@ -24,64 +24,7 @@ export default function Home() {
   const [isLoadingPrompts, setIsLoadingPrompts] = useState(true)
   const [isGeneratingPlaylists, setIsGeneratingPlaylists] = useState(false)
 
-  // Load playlists when connected
-  useEffect(() => {
-    if (isConnected) {
-      loadTodaysPlaylists()
-      loadBattlePrompts()
-      generatePlaylistsOnStartup()
-    }
-  }, [isConnected])
-
-  const generatePlaylistsOnStartup = async () => {
-    setIsGeneratingPlaylists(true)
-    try {
-      await playlistGenerationService.ensurePlaylistsGenerated()
-    } catch (error) {
-      console.error('Error generating playlists on startup:', error)
-    } finally {
-      setIsGeneratingPlaylists(false)
-      // Load the playlists after generation attempt
-      loadTodaysPlaylists()
-      loadBattlePrompts()
-    }
-  }
-
-  const loadTodaysPlaylists = async () => {
-    try {
-      setIsLoadingPlaylists(true)
-      const todaysPlaylists = await randomSeedService.getTodaysPlaylists()
-      setPlaylists(todaysPlaylists)
-    } catch (error) {
-      console.error('Error loading playlists:', error)
-      setPlaylists(randomSeedService.getFallbackPlaylists())
-    } finally {
-      setIsLoadingPlaylists(false)
-    }
-  }
-
-  const loadBattlePrompts = async () => {
-    try {
-      setIsLoadingPrompts(true)
-      const response = await fetch('/api/playlist-battle/prompts')
-      const data = await response.json()
-      
-      if (data.success && data.prompts.length > 0) {
-        setBattlePrompts(data.prompts)
-        console.log('Loaded battle prompts:', data.prompts)
-      } else {
-        console.warn('No prompts found, using fallback')
-        setBattlePrompts(getFallbackPrompts())
-      }
-    } catch (error) {
-      console.error('Error loading battle prompts:', error)
-      setBattlePrompts(getFallbackPrompts())
-    } finally {
-      setIsLoadingPrompts(false)
-    }
-  }
-
-  const getFallbackPrompts = () => {
+  const getFallbackPrompts = useCallback(() => {
     return [
       {
         id: 'temp-1',
@@ -108,13 +51,69 @@ export default function Home() {
         color_gradient: 'from-blue-600 to-cyan-600'
       }
     ]
-  }
+  }, [])
+
+  const loadTodaysPlaylists = useCallback(async () => {
+    try {
+      setIsLoadingPlaylists(true)
+      const todaysPlaylists = await randomSeedService.getTodaysPlaylists()
+      setPlaylists(todaysPlaylists)
+    } catch (error) {
+      console.error('Error loading playlists:', error)
+      setPlaylists(randomSeedService.getFallbackPlaylists())
+    } finally {
+      setIsLoadingPlaylists(false)
+    }
+  }, [])
+
+  const loadBattlePrompts = useCallback(async () => {
+    try {
+      setIsLoadingPrompts(true)
+      const response = await fetch('/api/playlist-battle/prompts')
+      const data = await response.json()
+      
+      if (data.success && data.prompts.length > 0) {
+        setBattlePrompts(data.prompts)
+        console.log('Loaded battle prompts:', data.prompts)
+      } else {
+        console.warn('No prompts found, using fallback')
+        setBattlePrompts(getFallbackPrompts())
+      }
+    } catch (error) {
+      console.error('Error loading battle prompts:', error)
+      setBattlePrompts(getFallbackPrompts())
+    } finally {
+      setIsLoadingPrompts(false)
+    }
+  }, [getFallbackPrompts]) // Added dependency
+
+  const generatePlaylistsOnStartup = useCallback(async () => {
+    setIsGeneratingPlaylists(true)
+    try {
+      await playlistGenerationService.ensurePlaylistsGenerated()
+    } catch (error) {
+      console.error('Error generating playlists on startup:', error)
+    } finally {
+      setIsGeneratingPlaylists(false)
+      // Load the playlists after generation attempt
+      loadTodaysPlaylists()
+      loadBattlePrompts()
+    }
+  }, [loadTodaysPlaylists, loadBattlePrompts]) // Added dependencies
+
+  // Load playlists when connected
+  useEffect(() => {
+    if (isConnected) {
+      loadTodaysPlaylists()
+      loadBattlePrompts()
+      generatePlaylistsOnStartup()
+    }
+  }, [isConnected, generatePlaylistsOnStartup, loadBattlePrompts, loadTodaysPlaylists])
 
   const handleUploadSuccess = () => {
     setRefreshSongs(prev => prev + 1)
     setShowUpload(false)
   }
-
 
   const handleStartBattle = async (promptId: string) => {
     console.log('Starting battle with prompt ID:', promptId)
@@ -136,17 +135,15 @@ export default function Home() {
 
   return (
     <div className="p-6">
-
-        {/* Show loading state during initial playlist generation */}
+      {/* Show loading state during initial playlist generation */}
       {isGeneratingPlaylists && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg flex items-center space-x-4">
             <div className="animate-spin">⟳</div>
-            <span>Generating today's playlists...</span>
+            <span>Generating today&apos;s playlists...</span>
           </div>
         </div>
       )}
-
 
       {showUpload ? (
         <section className="mb-8">
@@ -216,32 +213,32 @@ export default function Home() {
           </section>
 
           <section className="mb-8">
-  <div className="flex items-center justify-between mb-4">
-    <h2 className="text-2xl font-bold">Some Random Playlist 4 U</h2>
-    <button className="text-gray-400 hover:text-white text-sm font-semibold">
-      Show all
-    </button>
-  </div>
-  <div className="grid grid-cols-5 gap-6">
-    {playlists.map((playlist) => (
-      <Link 
-        key={playlist.id} 
-        href={`/playlist/${playlist.id}`}
-        className="block" // Add this to make the entire card clickable
-      >
-        <div className="bg-gray-800 bg-opacity-40 p-4 rounded-lg hover:bg-gray-700 transition-all cursor-pointer group">
-          <div className={`w-full aspect-square rounded-md ${playlist.color} mb-4 relative overflow-hidden`}>
-            <button className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105 shadow-lg">
-              <Play className="w-5 h-5 text-black" />
-            </button>
-          </div>
-          <h3 className="font-semibold mb-1">{playlist.name}</h3>
-          <p className="text-gray-400 text-sm">{playlist.description}</p>
-        </div>
-      </Link>
-    ))}
-  </div>
-</section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Some Random Playlist 4 U</h2>
+              <button className="text-gray-400 hover:text-white text-sm font-semibold">
+                Show all
+              </button>
+            </div>
+            <div className="grid grid-cols-5 gap-6">
+              {playlists.map((playlist) => (
+                <Link 
+                  key={playlist.id} 
+                  href={`/playlist/${playlist.id}`}
+                  className="block"
+                >
+                  <div className="bg-gray-800 bg-opacity-40 p-4 rounded-lg hover:bg-gray-700 transition-all cursor-pointer group">
+                    <div className={`w-full aspect-square rounded-md ${playlist.color} mb-4 relative overflow-hidden`}>
+                      <button className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105 shadow-lg">
+                        <Play className="w-5 h-5 text-black" />
+                      </button>
+                    </div>
+                    <h3 className="font-semibold mb-1">{playlist.name}</h3>
+                    <p className="text-gray-400 text-sm">{playlist.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <RecentlyUploaded refreshTrigger={refreshSongs} />
         </>

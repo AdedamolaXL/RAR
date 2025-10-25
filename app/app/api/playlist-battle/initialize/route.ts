@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase'
 import { userService } from '@/services/userService'
 import { songService } from '@/services/songService'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const { 

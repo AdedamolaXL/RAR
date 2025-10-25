@@ -19,37 +19,37 @@ export default function PlaylistBattleGallery() {
   const router = useRouter()
 
   useEffect(() => {
+    const loadGalleryPlaylists = async () => {
+      try {
+        setIsLoading(true)
+        
+        let url = '/api/playlist-battle/gallery'
+        if (filter === 'my' && address) {
+          url += `?userAddress=${address}`
+        }
+        
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        if (data.success) {
+          setGalleryData(data.galleryPlaylists)
+        }
+      } catch (error) {
+        console.error('Error loading gallery playlists:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
     loadGalleryPlaylists()
     loadAllSongs()
-  }, [filter])
+  }, [filter, address]) // Added address to dependencies
 
   useEffect(() => {
     fetch('/api/events').catch(console.error)
   }, [])
 
-  const loadGalleryPlaylists = async () => {
-    try {
-      setIsLoading(true)
-      
-      let url = '/api/playlist-battle/gallery'
-      if (filter === 'my' && address) {
-        url += `?userAddress=${address}`
-      }
-      
-      const response = await fetch(url)
-      const data = await response.json()
-      
-      if (data.success) {
-        setGalleryData(data.galleryPlaylists)
-      }
-    } catch (error) {
-      console.error('Error loading gallery playlists:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const loadAllSongs = async () => {
+   const loadAllSongs = async () => {
     try {
       const songs = await songService.getSongs()
       setAllSongs(songs)

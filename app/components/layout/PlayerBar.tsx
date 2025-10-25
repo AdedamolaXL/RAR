@@ -10,8 +10,8 @@ export function PlayerBar() {
         <div className="flex items-center space-x-4 w-1/4">
           <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-600 rounded"></div>
           <div>
-            <h4 className="font-semibold text-sm">Growing NFT Beats</h4>
-            <p className="text-gray-400 text-xs">Web3 Symphony</p>
+            <h4 className="font-semibold text-sm">Jies</h4>
+            <p className="text-gray-400 text-xs">BNXN</p>
           </div>
           <Heart className="w-4 h-4 text-green-500" />
         </div>

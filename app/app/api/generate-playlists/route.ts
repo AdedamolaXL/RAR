@@ -4,6 +4,8 @@ import { supabase } from '@/lib/supabase'
 // Remove ethers import since we don't need blockchain connection for playlist generation
 // We'll get the seed from the database instead
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     console.log('🎵 Starting playlist generation...')

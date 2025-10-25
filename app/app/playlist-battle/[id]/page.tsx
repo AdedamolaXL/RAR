@@ -176,16 +176,16 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
   
   const canSubmit = playlistSongs.length > 0
 
-  if (isLoading) {
-    return <LoadingState />
-  }
+  // if (isLoading) {
+  //   return <LoadingState />
+  // }
 
   if (!battleInstance) {
     return (
       <div className="flex h-full bg-black text-white items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Battle Not Found</h1>
-          <p className="text-gray-400 mb-6">The playlist battle you're looking for doesn't exist.</p>
+          <p className="text-gray-400 mb-6">The playlist battle you&apos;re looking for doesn&apos;t exist.</p>
           <button 
             onClick={() => router.push('/')}
             className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full"
@@ -202,34 +202,34 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
       <div className="flex flex-col h-screen bg-black text-white">
         {/* Main Content - Fixed width and properly organized */}
         <div className="flex-1 flex min-h-0 overflow-hidden">
-  {/* Main content area - properly contained */}
-  <div className="flex-1 flex flex-col min-h-0 overflow-hidden mr-80">
-    {/* Fixed Header Section */}
-    <div className="flex-shrink-0 bg-gradient-to-b from-gray-900 to-black border-b border-gray-700/50">
-      <div className="max-w-6xl mx-auto px-8 pt-8 pb-4">
-        <PlaylistHeader
-          playlistPrompt={battleInstance.playlist_prompt}
-          playlistCount={playlistSongs.length}
-          energyUnits={energyUnits}
-        />
-      </div>
-    </div>
+          {/* Main content area - properly contained */}
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden mr-80">
+            {/* Fixed Header Section */}
+            <div className="flex-shrink-0 bg-gradient-to-b from-gray-900 to-black border-b border-gray-700/50">
+              <div className="max-w-6xl mx-auto px-8 pt-8 pb-4">
+                <PlaylistHeader
+                  playlistPrompt={battleInstance.playlist_prompt}
+                  playlistCount={playlistSongs.length}
+                  energyUnits={energyUnits}
+                />
+              </div>
+            </div>
 
-    {/* Scrollable Songs List Section */}
-    <div className="flex-1 bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
-      <div className="max-w-6xl mx-auto px-8 py-6">
-        <div className="bg-gray-800/30 rounded-2xl backdrop-blur-sm border border-gray-700/50">
-          {/* Songs List - Only this section scrolls */}
-          <div className="max-h-full overflow-y-auto">
-            <SongsList
-              songs={playlistSongs}
-              onPlaySong={playSong}
-              onLikeSong={handleLikeSong}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+            {/* Scrollable Songs List Section */}
+            <div className="flex-1 bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
+              <div className="max-w-6xl mx-auto px-8 py-6">
+                <div className="bg-gray-800/30 rounded-2xl backdrop-blur-sm border border-gray-700/50">
+                  {/* Songs List - Only this section scrolls */}
+                  <div className="max-h-full overflow-y-auto">
+                    <SongsList
+                      songs={playlistSongs}
+                      onPlaySong={playSong}
+                      onLikeSong={handleLikeSong}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           
           {/* Fixed Sidebar */}

@@ -5,6 +5,8 @@ import COIN_FLIP_ABI from '@/contracts/CoinFlip.json'
 
 const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { address: string } }
