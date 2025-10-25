@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AppProvider from "@/providers/app-provider"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"

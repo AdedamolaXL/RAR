@@ -45,10 +45,6 @@ export default function PlaylistBattleGallery() {
     loadAllSongs()
   }, [filter, address]) // Added address to dependencies
 
-  useEffect(() => {
-    fetch('/api/events').catch(console.error)
-  }, [])
-
    const loadAllSongs = async () => {
     try {
       const songs = await songService.getSongs()

@@ -24,6 +24,8 @@ export default function Home() {
   const [isLoadingPrompts, setIsLoadingPrompts] = useState(true)
   const [isGeneratingPlaylists, setIsGeneratingPlaylists] = useState(false)
 
+
+
   const getFallbackPrompts = useCallback(() => {
     return [
       {
@@ -87,28 +89,43 @@ export default function Home() {
     }
   }, [getFallbackPrompts]) // Added dependency
 
-  const generatePlaylistsOnStartup = useCallback(async () => {
-    setIsGeneratingPlaylists(true)
-    try {
-      await playlistGenerationService.ensurePlaylistsGenerated()
-    } catch (error) {
-      console.error('Error generating playlists on startup:', error)
-    } finally {
-      setIsGeneratingPlaylists(false)
-      // Load the playlists after generation attempt
-      loadTodaysPlaylists()
-      loadBattlePrompts()
-    }
-  }, [loadTodaysPlaylists, loadBattlePrompts]) // Added dependencies
+const generatePlaylistsOnStartup = useCallback(async () => {
+  setIsGeneratingPlaylists(true)
+  try {
+    await playlistGenerationService.ensurePlaylistsGenerated()
+  } catch (error) {
+    console.error('Error generating playlists on startup:', error)
+  } finally {
+    setIsGeneratingPlaylists(false)
+    await loadTodaysPlaylists()
+    await loadBattlePrompts()
+  }
+}, [loadTodaysPlaylists, loadBattlePrompts])
+  
 
-  // Load playlists when connected
+
   useEffect(() => {
-    if (isConnected) {
-      loadTodaysPlaylists()
-      loadBattlePrompts()
-      generatePlaylistsOnStartup()
+  if (isConnected) {
+    const today = new Date().toISOString().split('T')[0]
+    const lastGenerated = localStorage.getItem('playlistsLastGenerated')
+    
+    const initialize = async () => {
+      // Only generate once per day
+      if (lastGenerated !== today) {
+        console.log('🔄 Generating playlists for today...')
+        await generatePlaylistsOnStartup()
+        localStorage.setItem('playlistsLastGenerated', today)
+      } else {
+        console.log('🎵 Playlists already generated today, loading...')
+        await loadTodaysPlaylists()
+        await loadBattlePrompts()
+      }
     }
-  }, [isConnected, generatePlaylistsOnStartup, loadBattlePrompts, loadTodaysPlaylists])
+    
+    initialize()
+  }
+}, [isConnected, generatePlaylistsOnStartup, loadTodaysPlaylists, loadBattlePrompts])
+ 
 
   const handleUploadSuccess = () => {
     setRefreshSongs(prev => prev + 1)
@@ -165,7 +182,7 @@ export default function Home() {
           {/* Playlist Battle Section */}
           <section className="mb-8">
             <h1 className="text-3xl font-bold mb-2">Play a fun little game of Playlisting 😃</h1>
-            <p className="text-gray-400 mb-6">You never know what song is next ;)</p>
+            <p className="text-gray-400 mb-6">You never know what song you will find next ;)</p>
             
             {error && (
               <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded mb-4">

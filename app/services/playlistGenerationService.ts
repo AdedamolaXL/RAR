@@ -6,17 +6,15 @@ class PlaylistGenerationService {
   private generationPromise: Promise<boolean> | null = null
 
   async ensurePlaylistsGenerated(): Promise<boolean> {
-    // If we've already generated in this session, return
+    // Quick session check
     if (this.hasGeneratedThisSession) {
       return true
     }
 
-    // If generation is already in progress, return that promise
     if (this.generationPromise) {
       return this.generationPromise
     }
 
-    // Start new generation
     this.generationPromise = this.generatePlaylistsIfNeeded()
     const result = await this.generationPromise
     
@@ -31,36 +29,50 @@ class PlaylistGenerationService {
     try {
       const today = new Date().toISOString().split('T')[0]
       
-      // Check if playlists already exist for today
+      // FIRST: Check if playlists already exist
       const { data: existingPlaylists } = await supabase
         .from('daily_playlists')
         .select('id')
         .eq('day', today)
         .limit(1)
 
-      // If playlists already exist, no need to generate
+      // If playlists exist, STOP HERE - no API calls needed
       if (existingPlaylists && existingPlaylists.length > 0) {
-        console.log('🎵 Playlists already exist for today')
+        console.log('🎵 Playlists already exist for today - skipping generation')
         return true
       }
 
-      console.log('🔄 No playlists found for today, generating...')
+      console.log('🔄 No playlists found, starting generation...')
 
-      // Step 1: Generate seed if needed
-      const seedResponse = await fetch('/api/generate-daily-seed')
-      const seedData = await seedResponse.json()
+      // SECOND: Check if seed exists before generating
+      const { data: existingSeed } = await supabase
+        .from('daily_seeds')
+        .select('seed_hash')
+        .order('created_at', { ascending: false })
+        .limit(1)
 
-      if (!seedData.success) {
-        console.error('❌ Failed to generate seed:', seedData.error)
-        return false
+      // Only call seed API if no seed exists
+      if (!existingSeed || existingSeed.length === 0) {
+        console.log('🌱 No seed found, generating seed...')
+        const seedResponse = await fetch('/api/generate-daily-seed')
+        const seedData = await seedResponse.json()
+
+        if (!seedData.success) {
+          console.error('❌ Failed to generate seed:', seedData.error)
+          return false
+        }
+        console.log('✅ Seed generated successfully')
+      } else {
+        console.log('🌱 Using existing seed')
       }
 
-      // Step 2: Generate playlists with the seed
+      // THIRD: Generate playlists (this will use the existing or new seed)
+      console.log('🎵 Generating playlists...')
       const playlistsResponse = await fetch('/api/generate-playlists')
       const playlistsData = await playlistsResponse.json()
 
       if (playlistsData.success) {
-        console.log('✅ Playlists generated successfully on app startup')
+        console.log('✅ Playlists generated successfully')
         return true
       } else {
         console.error('❌ Failed to generate playlists:', playlistsData.error)
@@ -73,7 +85,6 @@ class PlaylistGenerationService {
     }
   }
 
-  // Reset for new sessions (optional)
   resetSession() {
     this.hasGeneratedThisSession = false
     this.generationPromise = null
