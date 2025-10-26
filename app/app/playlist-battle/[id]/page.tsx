@@ -68,7 +68,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
 
     const success = await addSongToPlaylist(songId)
     if (success) {
-      await loadBattleInstance()
+      
       removeSongFromRevealed(songId)
       console.log('✅ Added song to playlist and consumed 5 energy')
     } else {
@@ -84,7 +84,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
 
     const success = await passSong(songId)
     if (success) {
-      await loadBattleInstance()
+      
       removeSongFromRevealed(songId)
       console.log('✅ Passed song and consumed 3 energy')
     } else {
@@ -103,7 +103,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
   const handleSaveRearrange = async (reorderedSongIds: string[]) => {
     const success = await rearrangePlaylist(reorderedSongIds)
     if (success) {
-      await loadBattleInstance()
+     
       setIsRearrangeModalOpen(false)
       flipCardBack()
       console.log('✅ Playlist rearranged and gained 2 energy')
@@ -115,7 +115,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
   const handlePause = async () => {
     const success = await pause()
     if (success) {
-      await loadBattleInstance()
+      
       flipCardBack()
       console.log('✅ Paused and gained 5 energy')
     } else {
