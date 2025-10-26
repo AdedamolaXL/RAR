@@ -1,20 +1,31 @@
 # RAR - Random Algorithm Radio
 > A different way of listening, curating and finding music!
 
-RAR is a Web3 music streaming platform that turns playlist creation into a verifiable game of randomness, taste, and reputation. It’s where music curation becomes a form of play — and your taste can literally grow your playlist value on-chain.
+RAR is a Web3 music application that turns playlist creation into a verifiable game of randomness, taste, and reputation using [Pyth randomness](https://github.com/pyth-network/pyth-examples/tree/main/entropy). It’s where music listening becomes a form of play.!
+
 
 ## Inspiration
 Traditional music platforms use predictable algorithms that often lead to echo chambers. We wanted to create a platform where:
 - True randomness drives discovery
 - Community curation meets algorithmic generation
 - Blockchain verifiability ensures fair and transparent processes
-- Gamification makes music discovery fun and engaging
+- Turning playlist making into a game of discovery and excitement. 
 
 ## What It Does
 🎮 Playlist Battles
 - Coin-flip start: Begin with a blockchain-verified coin flip that determines your starting conditions
-- Energy-based gameplay: Manage energy units to add songs, pass on tracks, or rearrange your playlist
-- Random song reveals: Use cryptographic seeds to reveal songs from your personal library
+  - Heads initialize your playlist instance with 0 songs.
+  - Tails initialize your playlist instance with 2 songs. 
+- Energy-based gameplay: Manage energy units to:
+  -  add songs(-5 eu),
+  -  pass on tracks (-3 eu),
+  -  rearrange your playlist (+2 eu),
+  -  or just pause and do nothing (+5 eu)
+- Random song reveals: Use cryptographic seeds to reveal songs from your personal library.
+  - We turn the 64 hexademical string generated for each random seed into an ideal 64 song queue
+  - Where if the next character in your string determines if you get a song in your next queue or not
+    - if the next character in the string is numbers, you get a song revealed
+    - if the next character is an alphabet, no song is revealed :)   
 - Gallery submission: Share your curated playlists with the community
 
 🎵 Daily Algorithmic Playlists
@@ -43,9 +54,9 @@ Blockchain & Smart Contracts
 - Arbitrum Sepolia for low-cost transactions
 - Pyth Network for verifiable randomness
 - Custom Solidity Contracts:
-  - RandomSeed.sol - Daily random seed generation
-  - CoinFlip.sol - Fair random number generation for gameplay
-  - PlaylistReputationNFT.sol - Reputation tracking with decay
+  - [RandomSeed.sol](https://github.com/AdedamolaXL/RAR/blob/main/contract/contracts/RandomSeed.sol) - Daily random seed generation
+  - [CoinFlip.sol](https://github.com/AdedamolaXL/RAR/blob/main/contract/contracts/CoinFlip.sol) - Fair random number generation for gameplay
+  - [PlaylistReputationNFT.sol](https://github.com/AdedamolaXL/RAR/blob/main/contract/contracts/PlaylistReputationNFT.sol) - Reputation tracking with decay
 
 ## Local Development
 
@@ -102,27 +113,11 @@ npm start
 ### Project Structure
 ```bash
 app/
-├── app/                    # Next.js app router pages
-├── components/            # Reusable UI components
-├── contracts/            # Smart contract ABIs and addresses
+├── app/                 # Next.js app router pages
+├── components/          # Reusable UI components
+├── contracts/           # Smart contract ABIs and addresses
 ├── hooks/               # Custom React hooks
 ├── lib/                 # Utility libraries
 ├── services/            # Business logic and API services
 └── types/               # TypeScript type definitions
 ```
-
-##  Smart Contracts
-- RandomSeed.sol
-  -Generates daily random seeds using Pyth Entropy
-  - Stores seeds for playlist generation
-  - Fee-based random number requests
-
-- CoinFlip.sol
-  - Handles fair coin flips for gameplay
-  - Uses Pyth for verifiable randomness
-  - Tracks user results and timestamps
-
-- PlaylistReputationNFT.sol
-  - ERC-721 NFTs for playlist reputation
-  - Decay mechanics for ongoing engagement
-  - Voting-based reputation growth
