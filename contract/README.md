@@ -1,4 +1,4 @@
-# NFT Growth Contract
+# RAR Smart Contracts
 
 This repository contains the smart contracts for the RAR (Random Algorithm Radio) project, utilizing Solidity ^0.8.24. The contracts enable verifiable randomness, gamified playlist creation, and reputation tracking while integrating with the Pyth network for entropy (randomness) services.
 
