@@ -48,7 +48,81 @@ Blockchain & Smart Contracts
   - PlaylistReputationNFT.sol - Reputation tracking with decay
 
 ## Local Development
-Prerequisites
+
+### Prerequisites
 - Node.js 18+
 - Supabase account
 - Wallet with Arbitrum Sepolia ETH
+
+### Environment Setup
+```bash
+# Clone the repository
+git clone [repository-url]
+cd rar
+```
+
+```bash
+# Install dependencies
+npm install
+```
+
+```bash
+# Set up environment variables
+cp .env.example .env.local
+```
+
+### Environment Variables
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Blockchain
+ARBITRUM_SEPOLIA_RPC_URL=your_arbitrum_rpc_url
+WALLET_PRIVATE_KEY=your_wallet_private_key
+
+# Contracts
+RANDOM_SEED_ADDRESS=0xA13C674F8A8715E157BA42237A6b1Dff24EE274F
+COIN_FLIP_ADDRESS=0x762353AdF1342ba85f6dDEac0446E2DA43ab84bf
+PLAYLIST_REPUTATION_NFT_ADDRESS=0x0532d0A87B6013a8A086C37D39BC1EB013abC2f4
+```
+
+### Running the Application
+
+```bash
+# Development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+### Project Structure
+```bash
+app/
+├── app/                    # Next.js app router pages
+├── components/            # Reusable UI components
+├── contracts/            # Smart contract ABIs and addresses
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility libraries
+├── services/            # Business logic and API services
+└── types/               # TypeScript type definitions
+```
+
+##  Smart Contracts
+- RandomSeed.sol
+  -Generates daily random seeds using Pyth Entropy
+  - Stores seeds for playlist generation
+  - Fee-based random number requests
+
+- CoinFlip.sol
+  - Handles fair coin flips for gameplay
+  - Uses Pyth for verifiable randomness
+  - Tracks user results and timestamps
+
+- PlaylistReputationNFT.sol
+  - ERC-721 NFTs for playlist reputation
+  - Decay mechanics for ongoing engagement
+  - Voting-based reputation growth
