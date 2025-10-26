@@ -1,12 +1,12 @@
-# Pyth Entropy Example
+# RAR - Random Algorithm Radio
 
-This Next.js project demonstrates a basic use case of Pyth Entropy by integrating it into a web application to simulate the growth process of NFTs. The application features frontend components and hooks to interact with smart contracts, handle state changes, and respond to events.
+This Next.js project demonstrates an experimental music platform that combines algorithmic playlist generation with blockchain randomness. The application features Web3 integration, verifiable randomness from Pyth Entropy, and gamified music discovery experiences.
 
 ## Features
 
-- **Minting NFTs**: Users can mint new NFTs.
-- **Growing NFTs**: Users can request to grow their NFTs based on randomness provided by the Pyth network.
-- **Event Watching**: The application listens to contract events to update UI accordingly.
+- **Algorithmic Playlists**: Blockchain-seeded algorithm generates fresh playlists daily.
+- **Playlist Battles**:  Start with verifiable coin flips using Pyth Entropy + Cryptographic seed-based song discovery.
+- **Playlist Reputation NFTs**: Time-based reputation decay to encourage ongoing engagement
 
 ## Development Setup
 
@@ -36,6 +36,6 @@ This will start the server on `http://localhost:3000`, and you can view your app
 
 ## Acknowledgments
 
-This example of using Pyth Entropy was created by [lualabs.xyz](https://lualabs.xyz).
+This implementation of Pyth Entropy for music and gaming applications was inspired by innovative uses of blockchain randomness. Special thanks to the Pyth network for providing verifiable entropy services and the broader Web3 community for continuous innovation.
 
-We hope this starter example inspires you to continue innovating and building creative solutions with NFTs.
+We hope these contracts inspire further development at the intersection of music, gaming, and blockchain technology, creating new possibilities for community-driven content creation and discovery.
