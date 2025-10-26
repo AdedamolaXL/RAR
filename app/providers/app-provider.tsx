@@ -1,3 +1,4 @@
+// app/providers/app-provider.tsx
 "use client"
 
 import { WagmiConfig } from "@/config"
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactNode } from "react"
 import { WagmiProvider } from "wagmi"
 import { UserProvider } from '@/contexts/UserContext'
+import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext'
 
 const queryClient = new QueryClient()
 
@@ -17,7 +19,9 @@ const AppProvider = ({ children }: AppProviderProps) => {
     <WagmiProvider config={WagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <UserProvider>
-          {children}
+          <AudioPlayerProvider>
+            {children}
+          </AudioPlayerProvider>
         </UserProvider>
       </QueryClientProvider>
     </WagmiProvider>

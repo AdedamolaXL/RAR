@@ -2,7 +2,7 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useBattleInstance } from '@/hooks/useBattleInstance'
 import { useRevealLogic } from '@/hooks/useRevealLogic'
 import { useAudioPlayer } from '@/hooks/useAudioPlayer'
@@ -25,6 +25,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
   const router = useRouter()
   const { address } = useAccount()
   const { user } = useUser()
+ 
   
   const [isRearrangeModalOpen, setIsRearrangeModalOpen] = useState(false)
 
@@ -122,6 +123,9 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
       alert('Failed to pause. Please try again.')
     }
   }
+
+  // Removed setPlaylist sync — useAudioPlayer manages its own queue internally now.
+  // If you need to push the playlist to the player, add a method to useAudioPlayer and call it here.
 
   const handleLikeSong = (songId: string) => {
     likeSong(songId, loadBattleInstance)

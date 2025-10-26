@@ -14,7 +14,7 @@ export function TopBar({ children }: TopBarProps) {
       <div className="flex space-x-4">
         {children || (
         <div className="flex items-center space-x-4">
-          <Wallet />
+          <Wallet /> 
           
         </div>
       )}

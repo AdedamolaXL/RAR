@@ -6,12 +6,16 @@ import { Wallet } from "@/components/wagmi/components/wallet"
 import Link from "next/link"
 import { Play, Shuffle, Heart, MoreHorizontal, ArrowLeft } from "lucide-react"
 import { songService } from '@/services/songService'
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext'
 
 interface PlaylistClientProps {
   playlist: any // Replace with proper type
 }
 
 export default function PlaylistClient({ playlist }: PlaylistClientProps) {
+
+  const { playSong, setPlaylist } = useAudioPlayer()
+
   const playEntirePlaylist = () => {
     if (!playlist || playlist.songs.length === 0) return
 
@@ -21,11 +25,11 @@ export default function PlaylistClient({ playlist }: PlaylistClientProps) {
     audio.play().catch(console.error)
   }
   
-  const playSong = (song: any) => {
-    const audioUrl = songService.getSongUrl(song.file_path)
-    const audio = new Audio(audioUrl)
-    audio.play().catch(console.error)
+  const handlePlaySong = (song: any) => {
+    setPlaylist(playlist.songs) // Set playlist context
+    playSong(song)
   }
+  
   
   if (!playlist) {
     return (
@@ -90,7 +94,7 @@ export default function PlaylistClient({ playlist }: PlaylistClientProps) {
               <div 
                 key={song.id} 
                 className="grid grid-cols-12 gap-4 px-4 py-2 rounded-md hover:bg-gray-800 transition-all cursor-pointer group"
-                onClick={() => playSong(song)}
+                onClick={() => handlePlaySong(song)}
               >
                 <div className="col-span-1 flex items-center">
                   <span className="text-gray-400 group-hover:hidden">{index + 1}</span>

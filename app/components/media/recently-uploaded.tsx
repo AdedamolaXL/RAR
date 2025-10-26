@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Play, Heart, MoreHorizontal } from 'lucide-react'
 import { songService } from '@/services/songService'
 import { Song } from '@/types/song'
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext'
 
 interface RecentlyUploadedProps {
   refreshTrigger?: number
@@ -13,6 +14,7 @@ export function RecentlyUploaded({ refreshTrigger = 0 }: RecentlyUploadedProps) 
   const [songs, setSongs] = useState<Song[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { playSong, setPlaylist, likeSong } = useAudioPlayer()
 
   const fetchRecentSongs = async () => {
     try {
@@ -63,32 +65,18 @@ export function RecentlyUploaded({ refreshTrigger = 0 }: RecentlyUploadedProps) 
     }
   }
 
-  const handlePlaySong = async (song: Song) => {
-    try {
-      // Increment play count
-      await songService.incrementPlayCount(song.id)
-      // Get the actual audio URL
-      const audioUrl = songService.getSongUrl(song.file_path)
-      
-      // Create an audio element to play the song
-      const audio = new Audio(audioUrl)
-      audio.play().catch(err => {
-        console.error('Error playing audio:', err)
-        alert('Error playing song. Please try again.')
-      })
-    } catch (err) {
-      console.error('Error playing song:', err)
+  useEffect(() => {
+    if (songs.length > 0) {
+      setPlaylist(songs)
     }
+  }, [songs, setPlaylist])
+
+  const handlePlaySong = async (song: Song) => {
+    await playSong(song)
   }
 
   const handleLikeSong = async (songId: string) => {
-    try {
-      await songService.likeSong(songId)
-      // Refresh the list to show updated likes
-      fetchRecentSongs()
-    } catch (err) {
-      console.error('Error liking song:', err)
-    }
+    await likeSong(songId, fetchRecentSongs)
   }
 
   if (isLoading) {

@@ -12,6 +12,7 @@ import { usePlaylistBattle } from '@/hooks/usePlaylistBattle'
 import { useAccount } from 'wagmi'
 import Link from "next/link"
 import { playlistGenerationService } from '@/services/playlistGenerationService'
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext'
 
 export default function Home() {
   const { startBattle, isLoading, error } = usePlaylistBattle()
@@ -23,8 +24,18 @@ export default function Home() {
   const [battlePrompts, setBattlePrompts] = useState<any[]>([])
   const [isLoadingPrompts, setIsLoadingPrompts] = useState(true)
   const [isGeneratingPlaylists, setIsGeneratingPlaylists] = useState(false)
+  const { playSong, setPlaylist } = useAudioPlayer()
 
+  const handlePlaySong = async (song: any) => {
+    await playSong(song)
+  }
 
+  const handlePlayPlaylist = (songs: any[]) => {
+    setPlaylist(songs)
+    if (songs.length > 0) {
+      playSong(songs[0])
+    }
+  }
 
   const getFallbackPrompts = useCallback(() => {
     return [
@@ -237,7 +248,7 @@ const generatePlaylistsOnStartup = useCallback(async () => {
               </button>
             </div>
             <div className="grid grid-cols-5 gap-6">
-              {playlists.map((playlist) => (
+                {playlists.map((playlist) => (
                 <Link 
                   key={playlist.id} 
                   href={`/playlist/${playlist.id}`}
@@ -245,7 +256,7 @@ const generatePlaylistsOnStartup = useCallback(async () => {
                 >
                   <div className="bg-gray-800 bg-opacity-40 p-4 rounded-lg hover:bg-gray-700 transition-all cursor-pointer group">
                     <div className={`w-full aspect-square rounded-md ${playlist.color} mb-4 relative overflow-hidden`}>
-                      <button className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105 shadow-lg">
+                      <button onClick={() => handlePlayPlaylist(playlist.songs || [])} className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-green-500 rounded-full p-2 hover:scale-105 shadow-lg">
                         <Play className="w-5 h-5 text-black" />
                       </button>
                     </div>
