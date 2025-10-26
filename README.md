@@ -1,7 +1,7 @@
 # RAR - Random Algorithm Radio
 > A different way of listening, curating and finding music!
 
-RAR is a Web3 music experience that turns playlist creation into a verifiable game of randomness, taste, and reputation. It’s where music curation becomes a form of play — and your taste can literally grow your playlist value on-chain.
+RAR is a Web3 music streaming platform that turns playlist creation into a verifiable game of randomness, taste, and reputation. It’s where music curation becomes a form of play — and your taste can literally grow your playlist value on-chain.
 
 ## Inspiration
 Traditional music platforms use predictable algorithms that often lead to echo chambers. We wanted to create a platform where:
