@@ -61,6 +61,10 @@ export async function POST(
       throw updateError
     }
 
+    if (process.env.NODE_ENV === 'production') {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+
     // Get updated song data using songService
     const allSongs = await songService.getSongs()
     const songMap = new Map(allSongs.map(song => [song.id, song]))

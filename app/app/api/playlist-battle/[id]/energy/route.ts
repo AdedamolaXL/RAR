@@ -54,6 +54,10 @@ export async function POST(
       throw updateError
     }
 
+    if (process.env.NODE_ENV === 'production') {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+
     return NextResponse.json({ 
       success: true,
       energy_units: updatedBattle.energy_units

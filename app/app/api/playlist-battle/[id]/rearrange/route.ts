@@ -89,6 +89,10 @@ export async function POST(
       throw updateError
     }
 
+    if (process.env.NODE_ENV === 'production') {
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+
     console.log('✅ Playlist rearranged successfully')
     
     return NextResponse.json({ 
