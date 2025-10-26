@@ -1,18 +1,34 @@
 # NFT Growth Contract
 
-This repository contains the smart contracts for the NFT Growth project, utilizing Solidity ^0.8.24. The contracts enable the creation, management, and interaction with NFTs while integrating with the Pyth network for entropy (randomness) services.
+This repository contains the smart contracts for the RAR (Random Algorithm Radio) project, utilizing Solidity ^0.8.24. The contracts enable verifiable randomness, gamified playlist creation, and reputation tracking while integrating with the Pyth network for entropy (randomness) services.
 
 ## Contracts Overview
 
-- **NFT.sol**: Implements an ERC721A token with functionalities for ownership and basic NFT management.
-- **NFTGrowth.sol**: Extends `NFT.sol` to add functionality for NFT growth, which uses entropy from the Pyth network to influence NFT states.
+- **RandomSeed.sol:** Manages daily random seed generation for algorithmic playlist creation using Pyth Entropy.
+
+- **CoinFlip.sol:** Handles fair coin flip mechanics for playlist battle initialization with verifiable randomness.
+
+- **PlaylistReputationNFT.sol:** Implements ERC721A tokens with reputation growth and decay mechanics for playlist creators.
 
 ## Features
 
-- Minting new NFTs with initial properties.
-- Growing NFTs by influencing their state with external entropy.
-- Locking and Unlocking NFT Mechanics: This functionality is crucial for managing the state of an NFT between random number requests and callbacks. The lock prevents new growth requests on an NFT until the current process is complete, thus avoiding callback spam. Once a callback has been completed and processed, the NFT can be unlocked, allowing further interactions. This ensures that each growth step is completed before a new one begins, maintaining the integrity and sequential logic of NFT state changes.
-- Withdrawal of contract balance by the owner.
+### RandomSeed Contract
+- Daily random seed generation using Pyth Entropy
+- Fee-based random number requests for playlist generation
+-Seed storage and retrieval for deterministic playlist algorithms
+- Automatic callback handling for entropy results
+
+### CoinFlip Contract
+- Fair coin flip mechanics for gameplay initialization
+- User-specific result tracking with timestamps
+- Integration with playlist battle energy systems
+- Verifiable randomness for transparent gameplay
+
+### PlaylistReputationNFT Contract
+- Minting reputation NFTs for successful playlist submissions
+- Voting-based reputation growth with community upvotes
+- Time-based reputation decay mechanics
+- Locking and unlocking mechanisms for state management between random callbacks
 
 ## Dependencies
 
@@ -41,7 +57,7 @@ To deploy the contracts to the Blast Sepolia network, use the following commands
 
 1. **Deploy and verify the Contract**:
    ```sh
-   bunx hardhat ignition deploy ignition/modules/App.ts --network blast-sepolia --verify
+   bunx hardhat ignition deploy ignition/modules/App.ts --network arbitrum-sepolia
    ```
 
 ### Interacting with the Contracts
@@ -50,32 +66,30 @@ After deployment, you can interact with the contracts through the Next.js projec
 
 ## Contract Functions
 
-### NFT Contract
+### RandomSeed Contract
 
-- `tokensOfOwner(address owner)`: Returns a list of token IDs owned by a given address.
-- `withdraw(address to)`: Withdraws the balance to a specified address.
+- requestRandomSeed(): Requests a new random seed for daily playlist generation (requires fee)
+- currentSeed(): Returns the current active random seed
+- getRequestFee(): Returns the fee required for making a seed request
 
-### NFTGrowth Contract
+### CoinFlip Contract
 
-- `mint()`: Allows a user to mint a new NFT.
-- `grow(uint256 tokenId, bytes32 userRandomNumber)`: Initiates the growth process of an NFT.
-- `unlock(uint256 tokenId)`: Unlocks the NFT after a lock period.
-- `ownerUnlock(uint256 tokenId)`: Allows the owner to unlock an NFT regardless of lock status.
-- `getGrowFee()`: Returns the fee required for making a grow request.
+- requestRandom(): Requests a random coin flip for gameplay initialization (requires fee)
+- getUserResult(address user): Returns the coin flip result for a specific user
+- hasUserResult(address user): Checks if a user has a pending or completed coin flip result
+- getRequestFee(): Returns the fee required for making a coin flip request
 
-### Internal Functions
+### PlaylistReputationNFT Contract
 
-- `requireLock(uint256 tokenId)`: Ensures that the NFT is locked and the lock period has expired before allowing certain actions.
-- `requireOwnership(uint256 tokenId)`: Checks if the caller is the owner of the NFT.
-- `entropyCallback(uint64 sequenceNumber, address provider, bytes32 randomNumber)`: Callback function used by the entropy system to deliver results.
-
-## Events
-
-- `NFTResult`: Emitted after the growth process with the result of the randomness.
-- `NftGrowthRequested`: Indicates that an NFT growth request has been made.
+- mintPlaylist(address to, string memory playlistName, string memory playlistId): Mints a new reputation NFT for a playlist
+- voteForPlaylist(uint256 tokenId): Increases reputation through community voting
+- triggerDecay(uint256 tokenId): Initiates reputation decay with random intensity
+- getPlaylistInfo(uint256 tokenId): Returns reputation and metadata for a playlist NFT
+- tokensOfOwner(address owner): Returns all token IDs owned by an address
+- unlock(uint256 tokenId): Unlocks an NFT after callback completion
 
 ## Acknowledgments
 
-This example of using Pyth Entropy was created by [lualabs.xyz](https://lualabs.xyz).
+This implementation of Pyth Entropy for music and gaming applications was inspired by innovative uses of blockchain randomness. Special thanks to the Pyth network for providing verifiable entropy services and the broader Web3 community for continuous innovation.
 
-We hope this starter example inspires you to continue innovating and building creative solutions with NFTs.
+We hope these contracts inspire further development at the intersection of music, gaming, and blockchain technology, creating new possibilities for community-driven content creation and discovery.
