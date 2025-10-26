@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/page.tsx
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
@@ -9,7 +8,6 @@ import { useAudioPlayer } from '@/hooks/useAudioPlayer'
 import { SidebarContainer } from '@/app/playlist-battle/[id]/components/Sidebar/SidebarContainer'
 import { PlaylistHeader } from '@/app/playlist-battle/[id]/components/MainContent/PlaylistHeader'
 import { SongsList } from '@/app/playlist-battle/[id]/components/MainContent/SongList'
-import { LoadingState } from '@/app/playlist-battle/[id]/LoadingState'
 import { RearrangeModal } from '@/app/playlist-battle/[id]/RearrangeModal'
 import { useBattleEnergy } from '@/hooks/useBattleEnergy'
 import { useAccount } from 'wagmi'
@@ -71,7 +69,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
     if (success) {
       
       removeSongFromRevealed(songId)
-      console.log('✅ Added song to playlist and consumed 5 energy')
+      console.log('Added song to playlist and consumed 5 energy')
     } else {
       alert('Failed to add song. Please try again.')
     }
@@ -87,7 +85,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
     if (success) {
       
       removeSongFromRevealed(songId)
-      console.log('✅ Passed song and consumed 3 energy')
+      console.log('Passed song and consumed 3 energy')
     } else {
       alert('Failed to pass song. Please try again.')
     }
@@ -107,7 +105,7 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
      
       setIsRearrangeModalOpen(false)
       flipCardBack()
-      console.log('✅ Playlist rearranged and gained 2 energy')
+      console.log('Playlist rearranged and gained 2 energy')
     } else {
       alert('Failed to rearrange playlist. Please try again.')
     }
@@ -118,14 +116,11 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
     if (success) {
       
       flipCardBack()
-      console.log('✅ Paused and gained 5 energy')
+      console.log('Paused and gained 5 energy')
     } else {
       alert('Failed to pause. Please try again.')
     }
   }
-
-  // Removed setPlaylist sync — useAudioPlayer manages its own queue internally now.
-  // If you need to push the playlist to the player, add a method to useAudioPlayer and call it here.
 
   const handleLikeSong = (songId: string) => {
     likeSong(songId, loadBattleInstance)
@@ -179,10 +174,6 @@ export default function PlaylistBattlePage({ params }: PlaylistBattlePageProps) 
   }
   
   const canSubmit = playlistSongs.length > 0
-
-  // if (isLoading) {
-  //   return <LoadingState />
-  // }
 
   if (!battleInstance) {
     return (

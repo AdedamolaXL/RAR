@@ -27,7 +27,7 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      // Validate file type
+
       const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/aac', 'audio/ogg']
       if (!allowedTypes.includes(file.type)) {
         alert('Please select a valid audio file (MP3, WAV, FLAC, AAC, OGG)')
@@ -111,7 +111,7 @@ export function UploadSong({ onUploadSuccess }: UploadSongProps) {
       }
     }
     
-    // Refresh the UI
+
     onUploadSuccess?.()
     
   } catch (error) {

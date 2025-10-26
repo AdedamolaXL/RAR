@@ -54,7 +54,7 @@ export const useBattleEnergy = (battleInstance: BattleInstance | null) => {
 
   return {
     energyUnits,
-    setEnergyUnits, // Add this to allow external updates
+    setEnergyUnits, 
     consumeEnergy,
     canAddSong: canAfford(5),
     canPassSong: canAfford(3),

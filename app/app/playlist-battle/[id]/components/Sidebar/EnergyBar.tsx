@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/components/Sidebar/EnergyBar.tsx
 import { Battery, BatteryCharging, BatteryLow } from 'lucide-react'
 
 interface EnergyBarProps {

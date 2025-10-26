@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/components/Sidebar/RevealCard.tsx
 import { Play, Plus, Eye, EyeOff, SkipForward, RefreshCw, Pause } from 'lucide-react'
 import { RevealResult } from '@/app/playlist-battle/[id]/types/playlist-battle'
 

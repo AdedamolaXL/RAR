@@ -1,4 +1,3 @@
-// app/hooks/useWeb3Auth.ts
 'use client'
 
 import { useState, useCallback } from 'react'
@@ -21,7 +20,7 @@ export const useWeb3Auth = () => {
     setError(null)
 
     try {
-      // Generate a sign-in message
+
       const message = `Sign in to RAR at ${new Date().toISOString()}`
       
       // Sign the message with the wallet

@@ -1,4 +1,3 @@
-// app/app/(home)/page.tsx
 'use client'
 
 import { Card } from "@/components/ui/card"
@@ -123,11 +122,11 @@ const generatePlaylistsOnStartup = useCallback(async () => {
     const initialize = async () => {
       // Only generate once per day
       if (lastGenerated !== today) {
-        console.log('🔄 Generating playlists for today...')
+        console.log('Generating playlists for today...')
         await generatePlaylistsOnStartup()
         localStorage.setItem('playlistsLastGenerated', today)
       } else {
-        console.log('🎵 Playlists already generated today, loading...')
+        console.log('Playlists already generated today, loading...')
         await loadTodaysPlaylists()
         await loadBattlePrompts()
       }

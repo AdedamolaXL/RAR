@@ -1,5 +1,3 @@
-// app/app/api/playlist-battle/[id]/rearrange/route.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
@@ -18,7 +16,6 @@ export async function POST(
       const body = await request.json()
       songOrder = body.songOrder
     } catch (e) {
-      // If no body or invalid JSON, songOrder will be undefined (random shuffle)
       console.log('No song order provided, will use random shuffle')
     }
 
@@ -44,7 +41,7 @@ export async function POST(
     let reorderedSongs: string[]
     
     if (songOrder && Array.isArray(songOrder) && songOrder.length > 0) {
-      // Manual rearrangement - validate that the provided order contains the same songs
+
       const originalSet = new Set(battle.playlist_songs)
       const newSet = new Set(songOrder)
       
@@ -58,7 +55,7 @@ export async function POST(
       reorderedSongs = songOrder
       console.log('📋 Manual rearrangement applied')
     } else {
-      // Random shuffle (fallback)
+
       reorderedSongs = [...battle.playlist_songs]
       for (let i = reorderedSongs.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -93,7 +90,7 @@ export async function POST(
       await new Promise(resolve => setTimeout(resolve, 100))
     }
 
-    console.log('✅ Playlist rearranged successfully')
+    console.log('Playlist rearranged successfully')
     
     return NextResponse.json({ 
       success: true, 
@@ -103,7 +100,7 @@ export async function POST(
     })
     
   } catch (error: any) {
-    console.error('❌ Error rearranging playlist:', error)
+    console.error('Error rearranging playlist:', error)
     return NextResponse.json(
       { error: error.message || 'Failed to rearrange playlist' },
       { status: 500 }

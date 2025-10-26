@@ -40,17 +40,17 @@ export const useRevealLogic = (randomSeed: string | undefined, queueSongs: Song[
 
     const flipCard = useCallback(async () => {
     if (!randomSeed || currentSeedIndex >= randomSeed.slice(2).length) {
-      console.log('🎲 Seed exhausted')
+      console.log('Seed exhausted')
       return
     }
 
     if (revealedQueueSongs.length >= queueSongs.length) {
-      console.log('🎵 All songs revealed')
+      console.log('All songs revealed')
       return
     }
 
     setIsFlipping(true)
-    setIsCardFlipped(true) // Flip the card immediately
+    setIsCardFlipped(true)
 
     await new Promise(resolve => setTimeout(resolve, 300))
 
@@ -66,7 +66,7 @@ export const useRevealLogic = (randomSeed: string | undefined, queueSongs: Song[
         console.log(`🎵 Revealed song: ${nextSong.title}`)
       }
     } else {
-      console.log(`⏭️ No reveal at index ${currentSeedIndex}`)
+      console.log(`No reveal at index ${currentSeedIndex}`)
     }
 
     setLastRevealResult(result)
@@ -102,14 +102,14 @@ return {
     revealedQueueSongs,
     currentSeedIndex,
     isFlipping,
-    isCardFlipped, // Return this state
+    isCardFlipped, 
     lastRevealResult,
     shouldRevealSong,
     getCurrentSeedChar,
     getRevealStats,
     canFlipMore,
     flipCard,
-    flipCardBack, // Return flip back function
+    flipCardBack, 
     removeSongFromRevealed,
     resetRevealState
   }

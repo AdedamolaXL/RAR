@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { User, CreateUserData } from '@/types/user'
 
 export const userService = {
-  // Generate a random username
+
   generateRandomUsername(): string {
    const nouns = ['Dreamer', 'Visionary', 'Harmony', 'Sonata', 'Nocturne', 'Melody', 'Echo', 'Aura', 'Mirage', 'Oasis', 'Nebula', 'Constellation', 'Infinity', 'Eternity', 'Solace', 'Reverie', 'Lullaby', 'Cascade', 'Zephyr', 'Horizon'];
     const numbers = Math.floor(1000 + Math.random() * 9000) // 4-digit random number

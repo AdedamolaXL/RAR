@@ -1,4 +1,3 @@
-// app/components/layout/PlayerBar.tsx
 'use client'
 
 import { Play, Pause, Heart, Shuffle, SkipBack, SkipForward, Repeat, Volume2, VolumeX } from "lucide-react"

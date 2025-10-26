@@ -3,7 +3,7 @@ import { Song, UploadSongData } from '@/types/song'
 import { useUser } from '@/contexts/UserContext'
 
 export const songService = {
-  // Upload song file to storage and create record
+
    async uploadSong(songData: UploadSongData, userId?: string) {
     try {
       const { title, artist, album, file } = songData
@@ -28,7 +28,7 @@ export const songService = {
         .from('songs')
         .getPublicUrl(filePath)
 
-            // Create song record in database with user association
+      // Create song record in database with user association
       const songDataToInsert: any = {
         title,
         artist,

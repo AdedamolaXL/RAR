@@ -1,4 +1,3 @@
-// app/hooks/useCoinFlip.ts
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { CoinFlipAddress } from '@/contracts/addresses'
 import COIN_FLIP_ABI from '@/contracts/CoinFlip.json'
@@ -82,7 +81,5 @@ export const useCoinFlipGetRequestFee = () => {
 
 // Helper function to get fee
 async function getRequestFee(): Promise<bigint> {
-  // This would typically be called via a read contract call
-  // For now, we'll return a default value or you can implement the actual call
-  return BigInt('1000000000000000') // 0.001 ETH as example
+  return BigInt('1000000000000000') 
 }

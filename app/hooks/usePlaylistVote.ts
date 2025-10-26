@@ -1,4 +1,3 @@
-// app/hooks/usePlaylistVote.ts
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
 

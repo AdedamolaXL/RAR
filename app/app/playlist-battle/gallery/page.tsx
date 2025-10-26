@@ -1,4 +1,3 @@
-// app/app/playlist-battle/gallery/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -43,7 +42,7 @@ export default function PlaylistBattleGallery() {
 
     loadGalleryPlaylists()
     loadAllSongs()
-  }, [filter, address]) // Added address to dependencies
+  }, [filter, address]) 
 
    const loadAllSongs = async () => {
     try {

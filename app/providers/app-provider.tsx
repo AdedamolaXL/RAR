@@ -1,4 +1,3 @@
-// app/providers/app-provider.tsx
 "use client"
 
 import { WagmiConfig } from "@/config"

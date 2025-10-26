@@ -1,10 +1,9 @@
-// app/services/playlistBattleService.ts
 import { supabase } from '@/lib/supabase'
 import { coinFlipService } from './coinFlipService'
 import { songService } from './songService'
 
 export const playlistBattleService = {
-  // Initialize a new playlist battle instance
+
   async initializeBattle(
     userId: string, 
     playlistPromptId: string,
@@ -15,25 +14,25 @@ export const playlistBattleService = {
 
       // Step 1: Get random number from CoinFlip
       const { sequenceNumber, txHash } = await coinFlipService.requestRandom(userAddress)
-      console.log('🎲 Random number requested, sequence:', sequenceNumber)
+      console.log('Random number requested, sequence:', sequenceNumber)
       
       // Step 2: Wait for result
       const randomResult = await coinFlipService.waitForUserResult(userAddress, 60000)
-      console.log('🎯 Random result received:', randomResult)
+      console.log('Random result received:', randomResult)
 
       const initialSeedCount = randomResult.isHeads ? 0 : 2
-      console.log(`💰 Coin flip result: ${randomResult.isHeads ? 'Heads' : 'Tails'} -> ${initialSeedCount} initial seeds`)
+      console.log(`Coin flip result: ${randomResult.isHeads ? 'Heads' : 'Tails'} -> ${initialSeedCount} initial seeds`)
       
       // Step 3: Generate library of 10 songs (similar to daily playlists)
       const allSongs = await songService.getSongs()
-      console.log(`🎵 Found ${allSongs.length} total songs`)
+      console.log(`Found ${allSongs.length} total songs`)
       
       const librarySongs = this.generateLibrary(allSongs, randomResult.randomNumber, 10)
-      console.log('📚 Generated library:', librarySongs.map(s => s.title))
+      console.log('Generated library:', librarySongs.map(s => s.title))
       
       // Step 4: Split songs between playlist and queue
       const { playlistSongs, queueSongs } = this.distributeSongs(librarySongs, initialSeedCount)
-      console.log(`🎧 Distribution - Playlist: ${playlistSongs.length}, Queue: ${queueSongs.length}`)
+      console.log(`Distribution - Playlist: ${playlistSongs.length}, Queue: ${queueSongs.length}`)
       
       // Step 5: Create battle instance in database (similar to daily_playlists)
       const { data: battleInstance, error } = await supabase
@@ -56,15 +55,15 @@ export const playlistBattleService = {
         .single()
       
       if (error) {
-        console.error('❌ Database error:', error)
+        console.error('Database error:', error)
         throw error
       }
 
-      console.log('✅ Battle instance created:', battleInstance.id)
+      console.log('Battle instance created:', battleInstance.id)
       return battleInstance
       
     } catch (error) {
-      console.error('❌ Error initializing playlist battle:', error)
+      console.error('Error initializing playlist battle:', error)
       throw error
     }
   },

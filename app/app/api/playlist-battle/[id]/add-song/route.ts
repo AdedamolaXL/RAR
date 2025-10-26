@@ -1,4 +1,3 @@
-// app/app/api/playlist-battle/[id]/add-song/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { songService } from '@/services/songService'

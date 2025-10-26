@@ -1,4 +1,3 @@
-// app/app/api/playlist-battle/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { playlistBattleService } from '@/services/playlistBattleService'
 

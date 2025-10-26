@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/components/RearrangeModal.tsx
 'use client'
 
 import { useState, useEffect } from 'react'

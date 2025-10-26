@@ -1,4 +1,3 @@
-// app/playlist/[id]/PlaylistClient.tsx (Client Component)
 'use client'
 
 import { Card } from "@/components/ui/card"

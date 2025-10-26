@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-// Remove ethers import since we don't need blockchain connection for playlist generation
-// We'll get the seed from the database instead
-
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    console.log('🎵 Starting playlist generation...')
+    console.log('Starting playlist generation...')
 
     // Get the most recent seed from the database
     const { data: latestSeed, error: seedError } = await supabase
@@ -34,7 +31,7 @@ export async function GET() {
     }
 
     const seed = latestSeed.seed_hash
-    console.log('✅ Using seed from database:', seed)
+    console.log('Using seed from database:', seed)
 
     // Generate and store playlists
     const result = await generateAndStorePlaylists(seed)
@@ -47,7 +44,7 @@ export async function GET() {
     })
 
   } catch (error: any) {
-    console.error('❌ Error generating playlists:', error)
+    console.error('Error generating playlists:', error)
     return NextResponse.json({ 
       success: false, 
       error: error.message || 'Failed to generate playlists' 
@@ -59,10 +56,10 @@ async function generateAndStorePlaylists(seed: string): Promise<any> {
   const allSongs = await getSongsFromSupabase()
   const today = new Date().toISOString().split('T')[0]
 
-  console.log(`📊 Found ${allSongs.length} songs in database`)
+  console.log(`Found ${allSongs.length} songs in database`)
 
   if (allSongs.length === 0) {
-    console.log('❌ No songs available for playlist generation')
+    console.log('No songs available for playlist generation')
     return { success: false, error: 'No songs available' }
   }
 
@@ -73,22 +70,21 @@ async function generateAndStorePlaylists(seed: string): Promise<any> {
     .eq('is_auto_generated', true)
 
   if (defError) {
-    console.error('❌ Error fetching playlist definitions:', defError)
+    console.error('Error fetching playlist definitions:', defError)
     return { success: false, error: 'Failed to fetch playlist definitions' }
   }
 
   if (!playlistDefs || playlistDefs.length === 0) {
-    console.log('❌ No playlist definitions found')
+    console.log('No playlist definitions found')
     return { success: false, error: 'No playlist definitions found' }
   }
 
-  console.log(`🎯 Generating ${playlistDefs.length} playlists from ${allSongs.length} songs`)
+  console.log(`Generating ${playlistDefs.length} playlists from ${allSongs.length} songs`)
 
   const results = []
   
-  // NEW: Create a master distribution plan for all songs
   const songDistribution = distributeSongsAcrossPlaylists(allSongs, playlistDefs.length, seed)
-  console.log('📋 Song distribution plan:', songDistribution)
+  console.log('Song distribution plan:', songDistribution)
   
   // Generate playlists for each definition
   for (let i = 0; i < playlistDefs.length; i++) {
@@ -113,10 +109,10 @@ async function generateAndStorePlaylists(seed: string): Promise<any> {
       })
     
     if (error) {
-      console.error(`❌ Error storing playlist ${definition.name}:`, error)
+      console.error(`Error storing playlist ${definition.name}:`, error)
       results.push({ name: definition.name, success: false, error: error.message })
     } else {
-      console.log(`✅ Successfully stored playlist: ${definition.name} with ${playlistSongs.length} songs`)
+      console.log(`Successfully stored playlist: ${definition.name} with ${playlistSongs.length} songs`)
       results.push({ name: definition.name, success: true, songCount: playlistSongs.length })
     }
   }
@@ -129,9 +125,9 @@ function distributeSongsAcrossPlaylists(allSongs: any[], playlistCount: number, 
   const songsPerPlaylist = 5
   const availableSongs = allSongs.length
   
-  console.log(`🎵 Distribution: ${playlistCount} playlists × ${songsPerPlaylist} songs = ${playlistCount * songsPerPlaylist} slots from ${availableSongs} songs`)
+  console.log(`Distribution: ${playlistCount} playlists × ${songsPerPlaylist} songs = ${playlistCount * songsPerPlaylist} slots from ${availableSongs} songs`)
   
-  // Always use the limited songs approach for more randomness
+
   return distributeWithSmartRandomness(allSongs, playlistCount, songsPerPlaylist, seed)
 }
 
@@ -146,7 +142,7 @@ function distributeWithSmartRandomness(allSongs: any[], playlistCount: number, s
   const totalSlots = playlistCount * songsPerPlaylist
   const maxUsagePerSong = Math.ceil(totalSlots / allSongs.length) + 1 // Allow some flexibility
   
-  console.log(`🎯 Max usage per song: ${maxUsagePerSong}`)
+  console.log(`Max usage per song: ${maxUsagePerSong}`)
   
   // Create a pool of available song slots
   let availableSongPool: any[] = []
@@ -157,7 +153,7 @@ function distributeWithSmartRandomness(allSongs: any[], playlistCount: number, s
     }
   })
   
-  console.log(`📦 Initial song pool size: ${availableSongPool.length}`)
+  console.log(`Initial song pool size: ${availableSongPool.length}`)
   
   // Shuffle the entire pool once with the main seed
   availableSongPool = fisherYatesShuffle(availableSongPool, seed)
@@ -201,11 +197,11 @@ function distributeWithSmartRandomness(allSongs: any[], playlistCount: number, s
     // Final shuffle of this playlist
     distribution[playlistIndex] = fisherYatesShuffle(playlist, playlistSeed + '_final')
     
-    console.log(`   Playlist ${playlistIndex}: ${playlist.map(s => s.title).join(', ')}`)
+    console.log(`Playlist ${playlistIndex}: ${playlist.map(s => s.title).join(', ')}`)
   }
   
   // Log final statistics
-  console.log('📊 Final song usage statistics:')
+  console.log('Final song usage statistics:')
   const finalUsage = new Map()
   distribution.forEach(playlist => {
     playlist.forEach(song => {
@@ -222,7 +218,7 @@ function distributeWithSmartRandomness(allSongs: any[], playlistCount: number, s
   distribution.forEach((playlist, index) => {
     const uniqueSongs = new Set(playlist.map(s => s.id))
     if (uniqueSongs.size !== playlist.length) {
-      console.warn(`⚠️ Playlist ${index} has duplicate songs!`)
+      console.warn(`Playlist ${index} has duplicate songs!`)
     }
   })
   

@@ -1,4 +1,3 @@
-// app/services/coinFlipService.ts
 import { CoinFlipAddress } from '@/contracts/addresses'
 import COIN_FLIP_ABI from '@/contracts/CoinFlip.json'
 import { ethers } from 'ethers'
@@ -20,7 +19,7 @@ const getWallet = () => {
 }
 
 export const coinFlipService = {
-  // Request a random number from CoinFlip contract
+
   async requestRandom(userAddress: string): Promise<{ sequenceNumber: string; txHash: string }> {
     try {
       console.log('Requesting random number from CoinFlip contract...')

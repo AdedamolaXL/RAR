@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { startDecayListener } from '@/lib/decayListener'
 
-// Keep the connection alive
 export const maxDuration = 300 // 5 minutes
 
 let isListenerRunning = false
@@ -17,7 +16,7 @@ export async function GET() {
       })
     }
 
-    console.log('🚀 Starting event listeners...')
+    console.log('Starting event listeners...')
     isListenerRunning = true
     
     // Import dynamically to avoid loading on server if not needed

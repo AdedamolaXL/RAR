@@ -1,4 +1,3 @@
-// app/playlist/[id]/playlist-data.ts (Server-side data fetching)
 import { supabase } from '@/lib/supabase'
 import { songService } from '@/services/songService'
 

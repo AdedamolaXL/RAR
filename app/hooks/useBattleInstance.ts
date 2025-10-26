@@ -1,5 +1,3 @@
-// app/app/playlist-battle/[id]/components/hooks/useBattleInstance.ts
-
 import { useState, useEffect } from 'react'
 import { BattleInstance, Song } from '@/app/playlist-battle/[id]/types/playlist-battle'
 
@@ -43,7 +41,7 @@ export const useBattleInstance = (battleId: string) => {
       setBattleInstance(data.updatedBattle)
       setPlaylistSongs(data.playlistSongs || [])
       setQueueSongs(data.queueSongs || [])
-      console.log('✅ Added song to playlist and consumed 5 energy')
+      console.log('Added song to playlist and consumed 5 energy')
       return true
     } else {
       console.error('Failed to add song:', data.error)
@@ -67,7 +65,7 @@ export const useBattleInstance = (battleId: string) => {
       if (data.success) {
         setBattleInstance(data.updatedBattle)
         setQueueSongs(data.queueSongs || [])
-        console.log('✅ Passed song and removed from queue')
+        console.log('Passed song and removed from queue')
         return true
       } else {
         console.error('Failed to pass song:', data.error)
@@ -85,7 +83,7 @@ export const useBattleInstance = (battleId: string) => {
       const response = await fetch(`/api/playlist-battle/${battleId}/rearrange`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ songOrder }) // Send the song order
+        body: JSON.stringify({ songOrder }) 
       })
       
       const data = await response.json()
@@ -93,9 +91,9 @@ export const useBattleInstance = (battleId: string) => {
         setBattleInstance(data.updatedBattle)
         // Update playlist songs with the new order
         if (data.updatedBattle.playlist_songs) {
-          await loadBattleInstance() // Reload to get full song data
+          await loadBattleInstance() 
         }
-        console.log('✅ Playlist rearranged and gained 2 energy')
+        console.log('Playlist rearranged and gained 2 energy')
         return true
       } else {
         console.error('Failed to rearrange playlist:', data.error)
@@ -117,7 +115,7 @@ export const useBattleInstance = (battleId: string) => {
       const data = await response.json()
       if (data.success) {
         setBattleInstance(data.updatedBattle)
-        console.log('✅ Paused and gained 5 energy')
+        console.log('Paused and gained 5 energy')
         return true
       } else {
         console.error('Failed to pause:', data.error)

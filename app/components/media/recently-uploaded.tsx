@@ -21,7 +21,6 @@ export function RecentlyUploaded({ refreshTrigger = 0 }: RecentlyUploadedProps) 
       setIsLoading(true)
       setError(null)
       const recentSongs = await songService.getSongs()
-      // Sort by creation date and take the 4 most recent
       const sortedSongs = recentSongs
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         .slice(0, 4)

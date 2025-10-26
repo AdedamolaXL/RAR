@@ -1,4 +1,3 @@
-// app/components/layout/Sidebar.tsx
 'use client'
 
 import Link from "next/link"
@@ -23,10 +22,7 @@ export function Sidebar({ onUploadClick }: SidebarProps) {
             <div className="w-6 h-6 bg-white rounded-sm"></div>
             <span>Home</span>
           </Link>
-          {/* <Link href="/nft" className="flex items-center space-x-4 text-gray-400 hover:text-white transition-colors">
-            <div className="w-6 h-6 bg-gray-600 rounded-sm"></div>
-            <span>NFT Management</span>
-          </Link> */}
+          
           <Link href="/playlist-battle/gallery" className="flex items-center space-x-4 text-gray-400 hover:text-white transition-colors">
             <div className="w-6 h-6 bg-gray-600 rounded-sm"></div>
             <span>Gallery</span>

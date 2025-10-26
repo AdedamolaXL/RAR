@@ -1,4 +1,3 @@
-// app/app/api/playlist-battle/gallery/[id]/vote/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { userService } from '@/services/userService'
@@ -99,21 +98,18 @@ export async function POST(
 
     if (updateError) {
       console.error('Error updating vote count:', updateError)
-      // Don't fail the request if this fails, just log it
     }
 
     // Handle blockchain interactions based on vote type
     if (voteType === 'upvote') {
       try {
-        console.log('🔼 Processing upvote with growth and potential decay...')
+        console.log('Processing upvote with growth and potential decay...')
         await handleUpvoteWithDecay(playlistId, playlist.user_id, playlist.playlist_name)
       } catch (blockchainError) {
         console.error('Blockchain operation failed:', blockchainError)
-        // Continue with the vote even if blockchain fails
       }
     } else {
-      // For downvotes, we could implement different logic if needed
-      console.log('🔽 Downvote recorded - no blockchain interaction')
+      console.log('Downvote recorded - no blockchain interaction')
     }
 
     return NextResponse.json({ 
@@ -134,11 +130,11 @@ export async function POST(
 
 async function handleUpvoteWithDecay(playlistId: string, playlistOwnerId: string, playlistName: string) {
   if (!PRIVATE_KEY) {
-    console.warn('🚫 No private key configured for blockchain operations')
+    console.warn('No private key configured for blockchain operations')
     return
   }
 
-  console.log('🎲 Starting upvote with potential decay...')
+  console.log('Starting upvote with potential decay...')
 
   try {
     const provider = new ethers.JsonRpcProvider(RPC_URL)
@@ -156,84 +152,81 @@ async function handleUpvoteWithDecay(playlistId: string, playlistOwnerId: string
       throw new Error('Playlist owner not found')
     }
 
-    console.log('🔍 Finding existing NFT for playlist...')
+    console.log('Finding existing NFT for playlist...')
     let existingTokenId: ethers.BigNumberish | null = null
     
     try {
       const ownerTokens = await contract.tokensOfOwner(ownerUser.wallet_address)
-      console.log('📋 Owner tokens:', ownerTokens.map((t: any) => t.toString()))
+      console.log('Owner tokens:', ownerTokens.map((t: any) => t.toString()))
       
       // Check if any existing token matches this playlist
       for (const token of ownerTokens) {
         try {
           const tokenInfo = await contract.getPlaylistInfo(token)
-          console.log(`🔍 Token ${token.toString()}:`, {
+          console.log(`Token ${token.toString()}:`, {
             playlistId: tokenInfo.playlistId,
             reputation: tokenInfo.reputation.toString()
           })
           
           if (tokenInfo.playlistId === playlistId) {
             existingTokenId = token
-            console.log('🎯 Found matching token:', token.toString())
+            console.log('Found matching token:', token.toString())
             break
           }
         } catch (error) {
-          console.log('⚠️ Error checking token:', token.toString(), error)
+          console.log('Error checking token:', token.toString(), error)
           continue
         }
       }
     } catch (error) {
-      console.log('❌ Error getting owner tokens:', error)
+      console.log('Error getting owner tokens:', error)
     }
 
     if (existingTokenId) {
-      // STEP 1: First, vote to grow the reputation
-      console.log('🗳️ Voting to grow reputation...')
+
+      console.log('Voting to grow reputation...')
       const voteTx = await contract.voteForPlaylist(existingTokenId)
       const voteReceipt = await voteTx.wait()
-      console.log('✅ Growth vote confirmed:', voteReceipt.hash)
+      console.log('Growth vote confirmed:', voteReceipt.hash)
 
       // Get reputation after growth
       const tokenInfoAfterGrowth = await contract.getPlaylistInfo(existingTokenId)
       const reputationAfterGrowth = Number(tokenInfoAfterGrowth.reputation)
-      console.log('📈 Reputation after growth:', reputationAfterGrowth)
+      console.log('Reputation after growth:', reputationAfterGrowth)
 
-      // STEP 2: Trigger decay with a reasonable ETH amount
-      // The contract will handle the entropy call internally
+
       if (reputationAfterGrowth > 0) {
-        console.log('⚡ Triggering decay with 0.001 ETH (should cover fee)...')
+        console.log('Triggering decay with 0.001 ETH (should cover fee)...')
         
         try {
-          // Send a reasonable amount of ETH - the contract will use what it needs and refund the rest
+
           const decayTx = await contract.triggerDecay(existingTokenId, {
-            value: ethers.parseEther("0.001") // Send 0.001 ETH, contract will use required fee
+            value: ethers.parseEther("0.001") 
           })
           const decayReceipt = await decayTx.wait()
-          console.log('✅ Decay triggered:', decayReceipt.hash)
-          console.log('⏳ Entropy callback will happen asynchronously...')
+          console.log('Decay triggered:', decayReceipt.hash)
+          console.log('Entropy callback will happen asynchronously...')
 
-          // We can't immediately check the result since decay happens asynchronously via entropy callback
-          // But we can update the UI with the growth result and let the decay happen in background
+    
           const reputationLevel = Math.floor(reputationAfterGrowth / 10)
           await supabase
             .from('users')
             .update({ reputation_level: reputationLevel })
             .eq('id', playlistOwnerId)
 
-          console.log('💾 Updated with growth reputation (decay will happen later):', reputationLevel)
+          console.log('Updated with growth reputation (decay will happen later):', reputationLevel)
 
         } catch (decayError) {
-          console.error('❌ Error triggering decay:', decayError)
-          // If decay fails, still update with the growth reputation
+          console.error('Error triggering decay:', decayError)
           const reputationLevel = Math.floor(reputationAfterGrowth / 10)
           await supabase
             .from('users')
             .update({ reputation_level: reputationLevel })
             .eq('id', playlistOwnerId)
-          console.log('💾 Updated with growth-only reputation:', reputationLevel)
+          console.log('Updated with growth-only reputation:', reputationLevel)
         }
       } else {
-        console.log('⚠️ Reputation is 0, skipping decay')
+        console.log('Reputation is 0, skipping decay')
         const reputationLevel = Math.floor(reputationAfterGrowth / 10)
         await supabase
           .from('users')
@@ -242,30 +235,30 @@ async function handleUpvoteWithDecay(playlistId: string, playlistOwnerId: string
       }
         
     } else {
-      // Mint new NFT for playlist owner (no decay on first mint)
-      console.log('🆕 Minting new NFT (no decay on first mint)...')
+
+      console.log('Minting new NFT (no decay on first mint)...')
       const mintTx = await contract.mintPlaylist(ownerUser.wallet_address, playlistName, playlistId)
       const receipt = await mintTx.wait()
-      console.log('✅ New NFT minted:', receipt.hash)
+      console.log('New NFT minted:', receipt.hash)
 
-      // Update user's reputation level (starts at 50 reputation = level 5)
+
       await supabase
         .from('users')
         .update({ reputation_level: 5 })
         .eq('id', playlistOwnerId)
         
-      console.log('💾 Set initial reputation level to 5')
+      console.log('Set initial reputation level to 5')
     }
 
-    console.log('🎉 Upvote with decay processing completed!')
+    console.log('Upvote with decay processing completed!')
 
   } catch (error) {
-    console.error('💥 Error in upvote with decay:', error)
+    console.error('Error in upvote with decay:', error)
     throw error
   }
 }
 
-// Keep the existing GET function for checking votes
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

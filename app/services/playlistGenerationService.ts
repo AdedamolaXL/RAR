@@ -1,4 +1,3 @@
-// app/services/playlistGenerationService.ts
 import { supabase } from '@/lib/supabase'
 
 class PlaylistGenerationService {

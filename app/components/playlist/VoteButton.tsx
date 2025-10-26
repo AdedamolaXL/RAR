@@ -1,4 +1,3 @@
-// app/components/playlist/VoteButtons.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -27,7 +26,6 @@ export const VoteButtons = ({
   }, [currentVoteCount])
 
   useEffect(() => {
-    // Check user's existing vote when component mounts
     const checkVote = async () => {
       const voteData = await checkUserVote(playlistId)
       if (voteData?.hasVoted) {
@@ -40,7 +38,6 @@ export const VoteButtons = ({
 
   const handleVote = async (voteType: 'upvote' | 'downvote') => {
     if (userVote === voteType) {
-      // Already voted this way, do nothing
       return
     }
 

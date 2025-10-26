@@ -1,4 +1,3 @@
-// app/app/api/playlist-battle/initialize/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { userService } from '@/services/userService'
@@ -16,7 +15,7 @@ export async function POST(request: NextRequest) {
       timestamp 
     } = await request.json()
     
-    console.log('🎮 Initialize API called with:', { 
+    console.log('Initialize API called with:', { 
       playlistPromptId, 
       userAddress, 
       coinFlipResult,
@@ -39,21 +38,21 @@ export async function POST(request: NextRequest) {
     const user = await userService.getUserByWalletAddress(userAddress.toLowerCase())
     
     if (!user) {
-      console.error('❌ User not found for address:', userAddress)
+      console.error('User not found for address:', userAddress)
       return NextResponse.json({ 
         error: 'User not found. Please ensure you are signed in.' 
       }, { status: 401 })
     }
 
-    console.log('✅ User found:', user.id, user.username)
+    console.log('User found:', user.id, user.username)
     
     // Calculate initial seed count based on coin flip
     const initialSeedCount = coinFlipResult ? 0 : 2
-    console.log(`💰 Coin flip result: ${coinFlipResult ? 'Heads' : 'Tails'} -> ${initialSeedCount} initial seeds`)
+    console.log(`Coin flip result: ${coinFlipResult ? 'Heads' : 'Tails'} -> ${initialSeedCount} initial seeds`)
     
     // Get all songs for library generation
     const allSongs = await songService.getSongs()
-    console.log(`🎵 Found ${allSongs.length} total songs`)
+    console.log(`Found ${allSongs.length} total songs`)
     
     if (allSongs.length === 0) {
       return NextResponse.json({ 
@@ -61,15 +60,14 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // Generate library of 10 songs using the random number as seed
     const librarySongs = generateLibrary(allSongs, randomNumber, 10)
-    console.log('📚 Generated library:', librarySongs.map(s => s.title))
+    console.log('Generated library:', librarySongs.map(s => s.title))
     
     // Split songs between playlist and queue
     const playlistSongs = librarySongs.slice(0, initialSeedCount)
     const queueSongs = librarySongs.slice(initialSeedCount)
     
-    console.log(`🎧 Distribution - Playlist: ${playlistSongs.length}, Queue: ${queueSongs.length}`)
+    console.log(`Distribution - Playlist: ${playlistSongs.length}, Queue: ${queueSongs.length}`)
     
     // Create battle instance in database
     const { data: battleInstance, error: dbError } = await supabase
@@ -77,7 +75,7 @@ export async function POST(request: NextRequest) {
   .insert({
     user_id: user.id,
     playlist_prompt_id: playlistPromptId,
-    random_seed: randomNumber, // This should already be a hex string like "0x..."
+    random_seed: randomNumber, 
     coin_flip_result: coinFlipResult,
     initial_seed_count: initialSeedCount,
     library_songs: librarySongs.map(song => song.id),
@@ -93,11 +91,11 @@ export async function POST(request: NextRequest) {
 
     
     if (dbError) {
-      console.error('❌ Database error:', dbError)
+      console.error('Database error:', dbError)
       throw dbError
     }
 
-    console.log('✅ Battle instance created:', battleInstance.id)
+    console.log('Battle instance created:', battleInstance.id)
     
     return NextResponse.json({ 
       success: true, 
@@ -105,7 +103,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error: any) {
-    console.error('❌ Error initializing playlist battle:', error)
+    console.error('Error initializing playlist battle:', error)
     return NextResponse.json(
       { 
         error: error.message || 'Failed to initialize battle',

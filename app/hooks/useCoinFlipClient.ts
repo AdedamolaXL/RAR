@@ -1,4 +1,3 @@
-// app/hooks/useCoinFlipClient.ts
 'use client'
 
 import { useAccount, useWriteContract, useReadContract } from 'wagmi'
@@ -31,9 +30,9 @@ export const useCoinFlipClient = () => {
     setError(null)
 
     try {
-      console.log('🎲 Requesting random number from CoinFlip contract...')
-      console.log('📍 Contract:', CoinFlipAddress)
-      console.log('👤 User:', address)
+      console.log('Requesting random number from CoinFlip contract...')
+      console.log('Contract:', CoinFlipAddress)
+      console.log('User:', address)
       
       // Ensure fee is a bigint (writeContractAsync expects bigint for value)
       const fee: bigint = typeof feeData === 'bigint'
@@ -42,7 +41,7 @@ export const useCoinFlipClient = () => {
           ? BigInt(feeData)
           : parseEther('0.0005')) // Default fallback
       
-      console.log('💰 Required fee:', fee.toString(), 'wei')
+      console.log('Required fee:', fee.toString(), 'wei')
       
       // Call requestRandom on the CoinFlip contract
       const hash = await writeContractAsync({
@@ -52,15 +51,15 @@ export const useCoinFlipClient = () => {
         value: fee,
       })
       
-      console.log('✅ Transaction sent:', hash)
+      console.log('Transaction sent:', hash)
       
       return {
-        sequenceNumber: '0', // We don't really need this
+        sequenceNumber: '0',
         txHash: hash
       }
       
     } catch (err: any) {
-      console.error('❌ Error requesting random:', err)
+      console.error('Error requesting random:', err)
       setError(err.message)
       return null
     } finally {
@@ -80,7 +79,7 @@ export const useCoinFlipClient = () => {
   }
 
   try {
-    console.log('📊 Checking user result for:', address)
+    console.log('Checking user result for:', address)
     
     const response = await fetch(`/api/coin-flip/result/${address}`)
     const data = await response.json()
@@ -89,7 +88,7 @@ export const useCoinFlipClient = () => {
       throw new Error(data.error)
     }
     
-    console.log('✅ User result format:')
+    console.log('User result format:')
     console.log('Random number:', data.result.randomNumber)
     console.log('Type:', typeof data.result.randomNumber)
     console.log('Is hex:', data.result.randomNumber.startsWith('0x'))
@@ -97,7 +96,7 @@ export const useCoinFlipClient = () => {
     return data.result
     
   } catch (err: any) {
-    console.error('❌ Error getting user result:', err)
+    console.error('Error getting user result:', err)
     setError(err.message)
     return null
   }
@@ -119,7 +118,7 @@ export const useCoinFlipClient = () => {
       
       return data.hasResult
     } catch (err: any) {
-      console.error('❌ Error checking user result:', err)
+      console.error('Error checking user result:', err)
       setError(err.message)
       return false
     }
@@ -140,13 +139,13 @@ export const useCoinFlipClient = () => {
     setError(null)
 
     try {
-      console.log('⏳ Waiting for random result...')
+      console.log('Waiting for random result...')
       const startTime = Date.now()
       
       return new Promise(async (resolve, reject) => {
         const checkInterval = setInterval(async () => {
           try {
-            // Check if timeout reached
+           
             if (Date.now() - startTime > timeoutMs) {
               clearInterval(checkInterval)
               reject(new Error('Timeout waiting for random result'))
@@ -160,23 +159,23 @@ export const useCoinFlipClient = () => {
               clearInterval(checkInterval)
               const result = await getUserResult()
               if (result) {
-                console.log('✅ Result received:', result)
+                console.log('Result received:', result)
                 resolve(result)
               } else {
                 reject(new Error('Failed to get result'))
               }
             } else {
-              console.log('⏳ Still waiting... checking again in 2s')
+              console.log('Still waiting... checking again in 2s')
             }
           } catch (error) {
             clearInterval(checkInterval)
             reject(error)
           }
-        }, 2000) // Check every 2 seconds
+        }, 2000) 
       })
       
     } catch (err: any) {
-      console.error('❌ Error waiting for result:', err)
+      console.error('Error waiting for result:', err)
       setError(err.message)
       return null
     } finally {

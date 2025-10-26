@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/components/Sidebar/SidebarContainer.tsx
 import { ArrowLeft } from 'lucide-react'
 import { BattleInstance, Song, RevealResult } from '@/app/playlist-battle/[id]/types/playlist-battle'
 import { RevealCard } from './RevealCard'

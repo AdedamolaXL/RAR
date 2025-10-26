@@ -13,7 +13,7 @@ export async function GET(
 ) {
   try {
     const userAddress = params.address
-    console.log('🔍 Checking if user has result:', userAddress)
+    console.log('Checking if user has result:', userAddress)
     
     const provider = new ethers.JsonRpcProvider(RPC_URL)
     const contract = new ethers.Contract(CoinFlipAddress, COIN_FLIP_ABI.abi, provider)
@@ -26,7 +26,7 @@ export async function GET(
       hasResult
     })
   } catch (error: any) {
-    console.error('❌ Error checking user result:', error)
+    console.error('Error checking user result:', error)
     return NextResponse.json({ 
       success: false, 
       error: error.message 

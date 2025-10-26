@@ -1,4 +1,3 @@
-// app/app/playlist-battle/[id]/components/MainContent/SongList.tsx
 import { Play, Heart, MoreHorizontal, ListMusic } from 'lucide-react'
 import { Song } from '@/app/playlist-battle/[id]/types/playlist-battle'
 

@@ -1,4 +1,3 @@
-// app/app/api/playlist-battle/prompts/route.ts
 import { NextResponse } from 'next/server'
 import { playlistBattleService } from '@/services/playlistBattleService'
 

@@ -6,13 +6,13 @@ import PLAYLIST_REPUTATION_NFT_ABI from '@/contracts/PlaylistReputationNFT.json'
 const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc"
 
 export function startDecayListener() {
-  console.log('👂 Starting decay event listener...')
+  console.log('Starting decay event listener...')
   
   const provider = new ethers.JsonRpcProvider(RPC_URL)
   const contract = new ethers.Contract(PlaylistReputationNFT, PLAYLIST_REPUTATION_NFT_ABI.abi, provider)
 
   contract.on('ReputationDecayed', async (tokenId, newReputation, event) => {
-    console.log('📉 Decay event detected!', {
+    console.log('Decay event detected!', {
       tokenId: tokenId.toString(),
       newReputation: newReputation.toString(),
       txHash: event.transactionHash
@@ -23,7 +23,7 @@ export function startDecayListener() {
       const tokenInfo = await contract.getPlaylistInfo(tokenId)
       const owner = await contract.ownerOf(tokenId)
       
-      console.log('🔍 Processing decay for:', {
+      console.log('Processing decay for:', {
         owner,
         playlistId: tokenInfo.playlistId,
         newReputation: newReputation.toString()
@@ -45,15 +45,15 @@ export function startDecayListener() {
           .update({ reputation_level: reputationLevel })
           .eq('id', user.id)
 
-        console.log('💾 Updated user reputation after decay:', {
+        console.log('Updated user reputation after decay:', {
           userId: user.id,
           newLevel: reputationLevel
         })
       }
     } catch (error) {
-      console.error('❌ Error processing decay event:', error)
+      console.error('Error processing decay event:', error)
     }
   })
 
-  console.log('✅ Decay listener started')
+  console.log('Decay listener started')
 }

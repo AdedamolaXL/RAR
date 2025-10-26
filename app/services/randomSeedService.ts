@@ -3,8 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { Song } from '@/types/song'
 
 export const randomSeedService = {
-
-  // Check if we have playlists for today
+  
   async hasPlaylistsForToday(): Promise<boolean> {
     const today = new Date().toISOString().split('T')[0]
     

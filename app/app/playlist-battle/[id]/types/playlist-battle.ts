@@ -49,6 +49,6 @@ export interface BattleInstance {
   library_songs: string[]
   playlist_songs: string[]
   queue_songs: string[]
-  energy_units: number // Add this
+  energy_units: number 
   created_at: string
 }

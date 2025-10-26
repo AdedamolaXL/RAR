@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server'
 import { ethers } from 'ethers'
 import { supabase } from '@/lib/supabase'
 
-// Import the JSON and extract the ABI
 import RANDOM_SEED_ARTIFACT from '@/contracts/RandomSeed.json'
 
 const RANDOM_SEED_ABI = RANDOM_SEED_ARTIFACT.abi
 const CONTRACT_ADDRESS = "0xA13C674F8A8715E157BA42237A6b1Dff24EE274F"
 
-// Use the actual environment variable name from your .env.local
 const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY
 const RPC_URL = process.env.ARBITRUM_SEPOLIA_RPC_URL || "https://sepolia-rollup.arbitrum.io/rpc"
 
@@ -35,7 +33,7 @@ export async function GET() {
     console.log('Current seed:', currentSeed)
     
     if (currentSeed !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
-      // Store the existing seed in database
+
       await supabase
         .from('daily_seeds')
         .insert({ 

@@ -1,4 +1,3 @@
-// app/components/layout/TopBar.tsx
 'use client'
 
 import { SkipBack, SkipForward } from "lucide-react"
